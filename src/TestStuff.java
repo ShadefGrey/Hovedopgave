@@ -40,5 +40,18 @@ public class TestStuff {
 //        s.recursiveConvert(f);
 //    }
 
+    public static void main(String[] args) {
+        byte[] b = new byte[4];
+        b[0] = 'a';
+        b[1] = 'b';
+        b[3] = 'g';
+        int i = 0;
+
+        while (b[i] != 0){
+            System.out.println((char) b[i]);
+            i++;
+        }
+    }
+
 
 }

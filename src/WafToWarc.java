@@ -9,8 +9,12 @@ import java.util.*;
  */
 public class WafToWarc {
 
+    //TODO cate nul nul nul, er slutning, start på næste er lige efter
     private int contentLenght;
     private byte[] contentCutOff;
+    private byte[] metaData = new byte[100];
+    private int metaCounter = 0;
+    private UUID responseId;
 
     public byte[] readWaf(File srcFile, UUID infoId, String date) {
         byte[] warcFile = new byte[2000];
@@ -33,6 +37,12 @@ public class WafToWarc {
                         contentCutOff = Service.growByteArray(contentCutOff);
                     }
                     contentCutOff[initialCounter] = (byte) content;
+
+                    if (metaData.length <= metaCounter) {
+                        metaData = Service.growByteArray(metaData);
+                    }
+                    metaData[metaCounter] = (byte) content;
+                    metaCounter++;
                 }
 
                 if (start) {
@@ -42,10 +52,11 @@ public class WafToWarc {
                     inputBytes[counter] = (byte) content;
                     counter++;
 
-                    if (counter > 7 && inputBytes[counter - 1] == 'X' && inputBytes[counter - 2] == 'X' && inputBytes[counter - 3] == 'X' &&
-                            inputBytes[counter - 4] == 'X' && inputBytes[counter - 5] == 'X' && inputBytes[counter - 6] == 'X') {
+                    if (counter >= 7 && inputBytes[counter - 1] == 0 && inputBytes[counter - 2] == 0 &&
+                            inputBytes[counter - 3] == 0 && inputBytes[counter - 4] == 'e' && inputBytes[counter - 5] == 't' && inputBytes[counter - 6] == 'a' &&
+                            inputBytes[counter - 7] == 'c') {
                         counter = counter - 6;
-                        for (int i = counter; i >= 0 && !cutPost; i--) {
+                        for (int i = counter; i >= 4 && !cutPost; i--) {
                             counter--;
                             if (inputBytes[i - 1] == 't' && inputBytes[i - 2] == 's' && inputBytes[i - 3] == 'o' && inputBytes[i - 4] == 'p') {
                                 cutPost = true;
@@ -53,6 +64,17 @@ public class WafToWarc {
                                 counter = counter - 4;
                             }
                         }
+
+                        int i = counter;
+                        while (inputBytes[i] != 0) {
+                            if (metaData.length <= metaCounter) {
+                                metaData = Service.growByteArray(metaData);
+                            }
+                            metaData[metaCounter] = inputBytes[i];
+                            metaCounter++;
+                            i++;
+                        }
+
                     }
                 }
 
@@ -60,7 +82,7 @@ public class WafToWarc {
 
                 inputStartList.add((byte) content);
 
-                //Find the place to start
+                //Find the place to start //TODO behøves denne?
                 if (!start && initialCounter > 9 && inputStartList.get(initialCounter - 1) == 0 && inputStartList.get(initialCounter - 2) == 0 &&
                         inputStartList.get(initialCounter - 3) == 0 && inputStartList.get(initialCounter - 4) == 0 && inputStartList.get(initialCounter - 5) == 'a' &&
                         inputStartList.get(initialCounter - 6) == 't' && inputStartList.get(initialCounter - 7) == 'a' && inputStartList.get(initialCounter - 8) == 'd') {
@@ -68,18 +90,18 @@ public class WafToWarc {
                 }
 
                 if (stop) {
-                    byte[] conentArray = new byte[counter];
+                    byte[] contentArray = new byte[counter];
                     System.out.println("input lenght: " + inputBytes.length);
-                    System.out.println("array lenght: " + conentArray.length);
+                    System.out.println("array lenght: " + contentArray.length);
 
-                    System.arraycopy(inputBytes, 0, conentArray, 0, counter);
+                    System.arraycopy(inputBytes, 0, contentArray, 0, counter);
 
 //                    String s = "";
-//                    for (int i = 0; i < conentArray.length; i++) {
-//                        s += (char) conentArray[i];
+//                    for (int i = 0; i < contentArray.length; i++) {
+//                        s += (char) contentArray[i];
 //                    }
                     contentLenght = counter;
-                    byte[] tmpWarcFile = warcRecord(infoId, date, conentArray);
+                    byte[] tmpWarcFile = warcRecord(infoId, date, contentArray);
                     for (int i = 0; i < tmpWarcFile.length; i++) {
                         if (warcFile.length <= tmpWarcFile.length + warcFilePointer) {
                             warcFile = Service.growByteArray(warcFile);
@@ -103,6 +125,8 @@ public class WafToWarc {
                     inputBytes = new byte[1000];
                     contentCutOff = new byte[100];
                     contentLenght = 0;
+                    metaCounter = 0;
+                    metaData = new byte[100];
                     inputStartList.clear();
 
                 }
@@ -112,8 +136,8 @@ public class WafToWarc {
             e.printStackTrace();
         }
         byte[] warcFileToReturn = new byte[warcFilePointer];
-        System.out.println(warcFile.length);
-        System.out.println(warcFilePointer);
+//        System.out.println(warcFile.length);
+//        System.out.println(warcFilePointer);
 
         for (int i = 0; i < warcFilePointer; i++) {
             warcFileToReturn[i] = warcFile[i];
@@ -159,7 +183,7 @@ public class WafToWarc {
                 }
             }
 
-            if (!http && contentCutOff[i] == 'e' && contentCutOff[i - 1] == 'm' && contentCutOff[i - 2] == 'i' && contentCutOff[i - 3] == 'm') {
+            if (i >= 3 && !http && contentCutOff[i] == 'e' && contentCutOff[i - 1] == 'm' && contentCutOff[i - 2] == 'i' && contentCutOff[i - 3] == 'm') {
                 i = i + 4;
                 mime = true;
             }
@@ -171,7 +195,7 @@ public class WafToWarc {
     //returns a byte[] consisting of a WARC record with header and content
     public byte[] warcRecord(UUID infoId, String date, byte[] content) {
         byte[] warcRecord;
-
+        responseId = UUID.randomUUID();
         String[] urlAndMime = getUrlAndMime();
         String http;
 
@@ -194,7 +218,7 @@ public class WafToWarc {
                 "WARC-Warcinfo-ID: <urn:uuid:" + infoId + ">\r\n" +
                 "WARC-Date: " + date + "\r\n" +
                 "WARC-IP-Address: 0.0.0.0\r\n" +
-                "WARC-Record-ID: <urn:uuid:" + UUID.randomUUID() + ">\r\n" +
+                "WARC-Record-ID: <urn:uuid:" + responseId + ">\r\n" +
                 "Content-Type: application/http;msgtype=response\r\n" +
                 "WARC-Identified-Payload-Type: " + urlAndMime[1] + "\r\n" +
                 "Content-Length: " + contentLenght +

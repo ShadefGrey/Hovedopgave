@@ -86,14 +86,14 @@ public class Main {
 //        System.out.println(m.readWaf(f));
 
         Service service = new Service(); //Converter en enkelt waf fil
-        File f = new File("C:\\Users\\ckha\\Desktop\\En waf fil\\Enmandsavisen\\06RPOI~A");
-        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test5.warc");
+        File f = new File("C:\\Users\\ckha\\Desktop\\0QO35I~9");
+        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test6.warc");
         service.writeFile(writeToFile, f);
 
 
 //        Service service = new Service();  //Converter et directory med waf filer
 //        File f = new File("C:\\Users\\ckha\\Desktop\\En waf fil");
-//        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test4.warc");
+//        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test6.warc");
 //        service.writeFile(writeToFile, f);
     }
 
