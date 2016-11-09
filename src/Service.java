@@ -1,6 +1,4 @@
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,6 +12,9 @@ public class Service {
 
     private DateFormat dateFormat;
     private WafToWarc wafToWarc;
+    private int stillGoing = 0;
+    private boolean warcInfo = false;
+    private FileOutputStream outputStream;
 //    public static File srcFile;
 //    public static File fileToMake;
 
@@ -41,7 +42,7 @@ public class Service {
         String s = "WARC/1.0\r\n" +
                 "WARC-Type: warcinfo\r\n" +
                 "WARC-Record-ID: <urn:uuid:" + warcInfoId + ">\r\n" +
-                "WARC-Date: " + warcInfoDate +"\r\n" +
+                "WARC-Date: " + warcInfoDate + "\r\n" +
                 "Content-Length: 0\r\n" +
                 "Content-Type: application/warc-fields\r\n" +
                 "\r\n" +
@@ -51,28 +52,76 @@ public class Service {
         return s.getBytes();
     }
 
-    public void writeWarc(File srcFile){
+    public void writeWarc(File srcFile) {
 
     }
 
     //TODO only for waf files
     public void writeFile(File fToMake, File srcFile) {
         try {
-            String date = dateFormat.format(
-                    new Date(srcFile.lastModified())
-            );
+            String date = dateFormat.format(new Date(srcFile.lastModified()));
 
-            byte[] b1 = wafToWarc.readWaf(srcFile, warcInfoId, date);
             if (!fToMake.exists()) {
                 fToMake.createNewFile();
             }
-            FileOutputStream outputStream = new FileOutputStream(fToMake);
+            outputStream = new FileOutputStream(fToMake);
             outputStream.write(warcInfo());
-//            outputStream.write(wafToWarc.warcRecord(warcInfoId, date, srcFile));
-            outputStream.write(b1);
+
+            if (srcFile.isDirectory()) {
+                recursiveConvert(srcFile);
+            } else {
+                byte[] b1 = wafToWarc.readWaf(srcFile, warcInfoId, date);
+                outputStream.write(b1);
+            }
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void recursiveConvert(File dirPath) {
+        try {
+            File f = dirPath;
+            File[] files = f.listFiles();
+
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    File file = files[i];
+//                String affix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1); //Waf har ikke affix tror jeg
+                    if (file.isFile()) {
+//                    convert(file.getAbsolutePath());
+                        FileInputStream fInput = new FileInputStream(file);
+                        int content;
+                        int counter = 0;
+                        byte[] findAffix = new byte[4];
+                        while ((content = fInput.read()) != -1 && counter < 4) {
+                            findAffix[counter] = (byte) content;
+
+                            counter++;
+
+                            if (counter == 4 && (char) findAffix[counter - 1] == 'F' && (char) findAffix[counter - 2] == 'A' &&
+                                    (char) findAffix[counter - 3] == 'W' && (char) findAffix[counter - 4] == '.') {
+
+                                String date = dateFormat.format(new Date(file.lastModified()));
+
+                                byte[] b1 = wafToWarc.readWaf(file, warcInfoId, date);
+
+                                outputStream.write(b1);
+
+                            }
+                        }
+                    }
+
+                    if (file.isDirectory()) {
+                        recursiveConvert(file);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

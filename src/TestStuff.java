@@ -29,8 +29,16 @@ public class TestStuff {
 //            e.printStackTrace();
 //        }
 //    }
-    String s = "HTTP/1.1 200 OK\n" +
-            "Content-Type: text/html" +
-            "\n" +
-            "\n";
+//    String s = "HTTP/1.1 200 OK\n" +
+//            "Content-Type: text/html" +
+//            "\n" +
+//            "\n";
+
+//    public static void main(String[] args) { //TODO check rekursiv (skal gøres public før tjek)
+//        Service s = new Service();
+//        File f = new File("C:\\Users\\ckha\\Desktop\\En waf fil");
+//        s.recursiveConvert(f);
+//    }
+
+
 }

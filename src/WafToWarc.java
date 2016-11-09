@@ -201,7 +201,6 @@ public class WafToWarc {
                 "\r\n" +
                 "\r\n";
 
-        //TODO den viser ikke automatisk link i webarchiveplayer???
         warcHeader += http;
 
         warcRecord = new byte[content.length + warcHeader.getBytes().length];
