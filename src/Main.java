@@ -90,7 +90,6 @@ public class Main {
         File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test3.warc");
 //        System.out.println(w.readWaf(f));
         service.writeFile(writeToFile, f);
-        System.out.println("Please commit");
     }
 
 
