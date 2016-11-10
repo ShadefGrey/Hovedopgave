@@ -117,6 +117,29 @@ public class WafToWarc {
                     warcFilePointer++;
                     warcFile[warcFilePointer] = '\n';
                     warcFilePointer++;
+                    //TODO tilføj metadata
+                    if (metaCounter > 0) {
+                        byte[] metaData = metaDataRecord();
+
+                        for (int i = 0; i < metaData.length; i++) {
+                            if (warcFile.length <= metaData.length + warcFilePointer) {
+                                warcFile = Service.growByteArray(warcFile);
+                            }
+                            warcFile[warcFilePointer] = metaData[i];
+                            warcFilePointer++;
+
+                        }
+
+                        warcFile[warcFilePointer] = '\r';
+                        warcFilePointer++;
+                        warcFile[warcFilePointer] = '\n';
+                        warcFilePointer++;
+                        warcFile[warcFilePointer] = '\r';
+                        warcFilePointer++;
+                        warcFile[warcFilePointer] = '\n';
+                        warcFilePointer++;
+                    }
+
                     cutPost = false;
                     start = false;
                     stop = false;
@@ -143,6 +166,28 @@ public class WafToWarc {
             warcFileToReturn[i] = warcFile[i];
         }
         return warcFileToReturn;
+    }
+
+    //returns a byte[] consisting of a metadata WARC record with the non content data with WARC-Concurrent-To the relevant response WARC record
+    public byte[] metaDataRecord() {
+
+        byte[] metaHeader = ("WARC/1.0\r\n" +
+                "WARC-Type: metadata\r\n" +
+                "WARC-Concurrent-To: <urn:uuid:" + responseId + ">\r\n" +
+                "WARC-IP-Address: 0.0.0.0\r\n" +
+                "WARC-Record-ID: <urn:uuid:" + UUID.randomUUID() + ">\r\n" +
+                "Content-Type: application/http;msgtype=response\r\n" +
+                "Content-Length: " + metaCounter +
+                "\r\n" +
+                "\r\n").getBytes();
+
+        byte[] bytesToReturn = new byte[metaCounter + metaHeader.length];
+        for(int i = 0; i<metaHeader.length;i++){
+            bytesToReturn[i] = metaHeader[i];
+        }
+        System.arraycopy(metaData, 0, bytesToReturn, metaHeader.length, metaCounter);
+
+        return bytesToReturn;
     }
 
 
@@ -192,7 +237,7 @@ public class WafToWarc {
         return stringToReturn;
     }
 
-    //returns a byte[] consisting of a WARC record with header and content
+    //returns a byte[] consisting of a response WARC record with header and content
     public byte[] warcRecord(UUID infoId, String date, byte[] content) {
         byte[] warcRecord;
         responseId = UUID.randomUUID();
