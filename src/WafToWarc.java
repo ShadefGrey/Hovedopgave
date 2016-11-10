@@ -19,19 +19,30 @@ public class WafToWarc {
     public byte[] readWaf(File srcFile, UUID infoId, String date) {
         byte[] warcFile = new byte[2000];
         int warcFilePointer = 0;
-        int counter = 0;
+        int lengthCounter = 0;
         ArrayList<Byte> inputStartList = new ArrayList<>();
         byte[] inputBytes = new byte[1000];
         contentCutOff = new byte[100];
 
         try (FileInputStream fInputStream = new FileInputStream(srcFile)) {
 
+            System.out.println(srcFile.length());
             int content;
             int initialCounter = 0;
+            int whenDoesItStop = 0;
+            int fileLenght = (int)srcFile.length()-1;
             boolean cutPost = false;
             boolean stop = false;
             boolean start = false;
-            while ((content = fInputStream.read()) != -1 && counter < 100000) {
+
+            //while loop that goes through the waf file and create warc records from the data
+            while ((content = fInputStream.read()) != -1 && lengthCounter < 100000) {
+
+                if(fileLenght == whenDoesItStop){
+                    System.out.println("ITS STOPPING");
+                }
+                whenDoesItStop++;
+
                 if (!start) {
                     if (contentCutOff.length <= initialCounter) {
                         contentCutOff = Service.growByteArray(contentCutOff);
@@ -46,33 +57,38 @@ public class WafToWarc {
                 }
 
                 if (start) {
-                    if (inputBytes.length <= counter) {
+                    if (inputBytes.length <= lengthCounter) {
                         inputBytes = Service.growByteArray(inputBytes);
                     }
-                    inputBytes[counter] = (byte) content;
-                    counter++;
+                    inputBytes[lengthCounter] = (byte) content;
+                    lengthCounter++;
+                    int metaEndToAdd = 0;
 
-                    if (counter >= 7 && inputBytes[counter - 1] == 0 && inputBytes[counter - 2] == 0 &&
-                            inputBytes[counter - 3] == 0 && inputBytes[counter - 4] == 'e' && inputBytes[counter - 5] == 't' && inputBytes[counter - 6] == 'a' &&
-                            inputBytes[counter - 7] == 'c') {
-                        counter = counter - 6;
-                        for (int i = counter; i >= 4 && !cutPost; i--) {
-                            counter--;
+                    if (lengthCounter >= 7 && inputBytes[lengthCounter - 1] == 0 && inputBytes[lengthCounter - 2] == 0 &&
+                            inputBytes[lengthCounter - 3] == 0 && inputBytes[lengthCounter - 4] == 'e' && inputBytes[lengthCounter - 5] == 't' && inputBytes[lengthCounter - 6] == 'a' &&
+                            inputBytes[lengthCounter - 7] == 'c') {
+                        lengthCounter = lengthCounter - 6;
+                        metaEndToAdd = metaEndToAdd + 6;
+                        for (int i = lengthCounter; i >= 4 && !cutPost; i--) {
+                            lengthCounter--;
+                            metaEndToAdd++;
                             if (inputBytes[i - 1] == 't' && inputBytes[i - 2] == 's' && inputBytes[i - 3] == 'o' && inputBytes[i - 4] == 'p') {
                                 cutPost = true;
                                 stop = true;
-                                counter = counter - 4;
+                                lengthCounter = lengthCounter - 4;
+                                metaEndToAdd = metaEndToAdd + 4;
                             }
                         }
 
-                        int i = counter;
-                        while (inputBytes[i] != 0) {
+                        int i = lengthCounter;
+                        while (metaEndToAdd > 0) {
                             if (metaData.length <= metaCounter) {
                                 metaData = Service.growByteArray(metaData);
                             }
                             metaData[metaCounter] = inputBytes[i];
                             metaCounter++;
                             i++;
+                            metaEndToAdd--;
                         }
 
                     }
@@ -90,17 +106,14 @@ public class WafToWarc {
                 }
 
                 if (stop) {
-                    byte[] contentArray = new byte[counter];
-                    System.out.println("input lenght: " + inputBytes.length);
-                    System.out.println("array lenght: " + contentArray.length);
+                    byte[] contentArray = new byte[lengthCounter];
+//                    System.out.println("input lenght: " + inputBytes.length);
+//                    System.out.println("array lenght: " + contentArray.length);
 
-                    System.arraycopy(inputBytes, 0, contentArray, 0, counter);
+                    System.arraycopy(inputBytes, 0, contentArray, 0, lengthCounter);
 
-//                    String s = "";
-//                    for (int i = 0; i < contentArray.length; i++) {
-//                        s += (char) contentArray[i];
-//                    }
-                    contentLenght = counter;
+
+                    contentLenght = lengthCounter;
                     byte[] tmpWarcFile = warcRecord(infoId, date, contentArray);
                     for (int i = 0; i < tmpWarcFile.length; i++) {
                         if (warcFile.length <= tmpWarcFile.length + warcFilePointer) {
@@ -143,7 +156,7 @@ public class WafToWarc {
                     cutPost = false;
                     start = false;
                     stop = false;
-                    counter = 0;
+                    lengthCounter = 0;
                     initialCounter = 0;
                     inputBytes = new byte[1000];
                     contentCutOff = new byte[100];
