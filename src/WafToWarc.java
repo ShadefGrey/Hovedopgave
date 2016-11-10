@@ -16,14 +16,14 @@ public class WafToWarc {
 
     public byte[] readWaf(File srcFile, UUID infoId, String date) {
 
-        int lengthCounter = 0;
         byte[] inputBytes = new byte[1000];
 
         try (FileInputStream fInputStream = new FileInputStream(srcFile)) {
 
-            System.out.println(srcFile.length());
-            int initialCounter = 0;
+            //counts up for every byte in the file you read
             int whenDoesItStop = 0;
+
+            //total lenght of the file
             int fileLenght = (int) srcFile.length() - 1;
             boolean cutPost = false;
             boolean stop = false;
@@ -42,6 +42,7 @@ public class WafToWarc {
                     metaCounter++;
                 }
 
+                //this method runs on the last byte of the file
                 if (fileLenght == whenDoesItStop) {
                     System.out.println("ITS STOPPING");
                     byte[] lastMeta = metaDataRecord(date);
@@ -49,31 +50,35 @@ public class WafToWarc {
                 }
                 whenDoesItStop++;
 
+                //starts when the inputstream is at the content of what will be a WARC record.
+                //Adds the content to an array
                 if (start) {
-                    if (inputBytes.length <= lengthCounter) {
+                    if (inputBytes.length <= contentLenght) {
                         inputBytes = Service.growByteArray(inputBytes);
                     }
-                    inputBytes[lengthCounter] = (byte) content;
-                    lengthCounter++;
+                    inputBytes[contentLenght] = (byte) content;
+                    contentLenght++;
                     int metaEndToAdd = 0;
 
-                    if (lengthCounter >= 7 && inputBytes[lengthCounter - 1] == 0 && inputBytes[lengthCounter - 2] == 0 &&
-                            inputBytes[lengthCounter - 3] == 0 && inputBytes[lengthCounter - 4] == 'e' && inputBytes[lengthCounter - 5] == 't' && inputBytes[lengthCounter - 6] == 'a' &&
-                            inputBytes[lengthCounter - 7] == 'c') {
-                        lengthCounter = lengthCounter - 6;
+                    if (contentLenght >= 7 && inputBytes[contentLenght - 1] == 0 && inputBytes[contentLenght - 2] == 0 &&
+                            inputBytes[contentLenght - 3] == 0 && inputBytes[contentLenght - 4] == 'e' && inputBytes[contentLenght - 5] == 't' && inputBytes[contentLenght - 6] == 'a' &&
+                            inputBytes[contentLenght - 7] == 'c') {
+                        contentLenght = contentLenght - 6;
                         metaEndToAdd = metaEndToAdd + 6;
-                        for (int i = lengthCounter; i >= 4 && !cutPost; i--) {
-                            lengthCounter--;
+                        for (int i = contentLenght; i >= 4 && !cutPost; i--) {
+                            contentLenght--;
                             metaEndToAdd++;
                             if (inputBytes[i - 1] == 't' && inputBytes[i - 2] == 's' && inputBytes[i - 3] == 'o' && inputBytes[i - 4] == 'p') {
                                 cutPost = true;
                                 stop = true;
-                                lengthCounter = lengthCounter - 4;
+                                contentLenght = contentLenght - 4;
                                 metaEndToAdd = metaEndToAdd + 4;
                             }
                         }
 
-                        int i = lengthCounter;
+                        int i = contentLenght;
+
+                        //adds the data after content, but before the next record, to metadata
                         while (metaEndToAdd > 0) {
                             if (metaData.length <= metaCounter) {
                                 metaData = Service.growByteArray(metaData);
@@ -87,56 +92,39 @@ public class WafToWarc {
                     }
                 }
 
-                initialCounter++;
 
+                //adds the data before content to metadata
                 if (!start && metaCounter > 9 && metaData[metaCounter - 1] == 0 && metaCounter > 9 && metaData[metaCounter - 2] == 0 &&
                         metaData[metaCounter - 3] == 0 && metaData[metaCounter - 4] == 0 && metaData[metaCounter - 5] == 'a' &&
                         metaData[metaCounter - 6] == 't' && metaData[metaCounter - 7] == 'a' && metaData[metaCounter - 8] == 'd') {
                     start = true;
                 }
 
+                //this runs when all the content of a single record has been found.
+                //it adds response and metadata Warc record to the WARC file
                 if (stop) {
-                    byte[] contentArray = new byte[lengthCounter];
-//                    System.out.println("input lenght: " + inputBytes.length);
-//                    System.out.println("array lenght: " + contentArray.length);
+                    byte[] contentArray = new byte[contentLenght];
 
-                    System.arraycopy(inputBytes, 0, contentArray, 0, lengthCounter);
+                    //copies the content from the response WARC record array into a new array that does not have the extra NULs
+                    System.arraycopy(inputBytes, 0, contentArray, 0, contentLenght);
 
-
-                    contentLenght = lengthCounter;
                     byte[] tmpWarcFile = warcRecord(infoId, date, contentArray);
 
+                    //runs a method that adds the tmpWarcFile to the WARC file that will be returned.
                     addToWarcFile(tmpWarcFile);
 
-                    warcFile[warcFilePointer] = '\r';
-                    warcFilePointer++;
-                    warcFile[warcFilePointer] = '\n';
-                    warcFilePointer++;
-                    warcFile[warcFilePointer] = '\r';
-                    warcFilePointer++;
-                    warcFile[warcFilePointer] = '\n';
-                    warcFilePointer++;
-                    //TODO tilføj metadata
+                    //if there is any metadata add it to the WARC file, concurrent to the above response record
                     if (metaCounter > 0) {
                         byte[] metaDataContent = metaDataRecord(date);
-
                         addToWarcFile(metaDataContent);
 
-                        warcFile[warcFilePointer] = '\r';
-                        warcFilePointer++;
-                        warcFile[warcFilePointer] = '\n';
-                        warcFilePointer++;
-                        warcFile[warcFilePointer] = '\r';
-                        warcFilePointer++;
-                        warcFile[warcFilePointer] = '\n';
-                        warcFilePointer++;
                     }
 
+                    //resets, what needs to be resat before finding the data for the next WARC record in the waf file.
                     cutPost = false;
                     start = false;
                     stop = false;
-                    lengthCounter = 0;
-                    initialCounter = 0;
+                    contentLenght = 0;
                     inputBytes = new byte[1000];
                     contentLenght = 0;
                     metaCounter = 0;
@@ -148,8 +136,6 @@ public class WafToWarc {
             e.printStackTrace();
         }
         byte[] warcFileToReturn = new byte[warcFilePointer];
-//        System.out.println(warcFile.length);
-//        System.out.println(warcFilePointer);
 
         for (int i = 0; i < warcFilePointer; i++) {
             warcFileToReturn[i] = warcFile[i];
@@ -165,6 +151,16 @@ public class WafToWarc {
             warcFile[warcFilePointer] = bytesToAdd[i];
             warcFilePointer++;
         }
+
+        //\r\n\r\n added to the WARC file så the next record starts at the right place
+        warcFile[warcFilePointer] = '\r';
+        warcFilePointer++;
+        warcFile[warcFilePointer] = '\n';
+        warcFilePointer++;
+        warcFile[warcFilePointer] = '\r';
+        warcFilePointer++;
+        warcFile[warcFilePointer] = '\n';
+        warcFilePointer++;
     }
 
     //returns a byte[] consisting of a metadata WARC record with the non content data with WARC-Concurrent-To the relevant response WARC record
