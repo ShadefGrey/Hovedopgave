@@ -1,7 +1,4 @@
-import org.jwat.warc.WarcRecord;
-
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -20,22 +17,21 @@ public class WafToWarc {
     public byte[] readWaf(File srcFile, UUID infoId, String date) {
 
         int lengthCounter = 0;
-        ArrayList<Byte> inputStartList = new ArrayList<>();
         byte[] inputBytes = new byte[1000];
 
         try (FileInputStream fInputStream = new FileInputStream(srcFile)) {
 
             System.out.println(srcFile.length());
-            int content;
             int initialCounter = 0;
             int whenDoesItStop = 0;
-            int fileLenght = (int)srcFile.length()-1;
+            int fileLenght = (int) srcFile.length() - 1;
             boolean cutPost = false;
             boolean stop = false;
             boolean start = false;
 
+            int content;
             //while loop that goes through the waf file and create warc records from the data
-            while ((content = fInputStream.read()) != -1 && lengthCounter < 100000) {
+            while ((content = fInputStream.read()) != -1) {
 
 
                 if (!start) {
@@ -46,7 +42,7 @@ public class WafToWarc {
                     metaCounter++;
                 }
 
-                if(fileLenght == whenDoesItStop){
+                if (fileLenght == whenDoesItStop) {
                     System.out.println("ITS STOPPING");
                     byte[] lastMeta = metaDataRecord(date);
                     addToWarcFile(lastMeta);
@@ -93,12 +89,9 @@ public class WafToWarc {
 
                 initialCounter++;
 
-                inputStartList.add((byte) content);
-
-                //Find the place to start
-                if (!start && initialCounter > 9 && inputStartList.get(initialCounter - 1) == 0 && inputStartList.get(initialCounter - 2) == 0 &&
-                        inputStartList.get(initialCounter - 3) == 0 && inputStartList.get(initialCounter - 4) == 0 && inputStartList.get(initialCounter - 5) == 'a' &&
-                        inputStartList.get(initialCounter - 6) == 't' && inputStartList.get(initialCounter - 7) == 'a' && inputStartList.get(initialCounter - 8) == 'd') {
+                if (!start && metaCounter > 9 && metaData[metaCounter - 1] == 0 && metaCounter > 9 && metaData[metaCounter - 2] == 0 &&
+                        metaData[metaCounter - 3] == 0 && metaData[metaCounter - 4] == 0 && metaData[metaCounter - 5] == 'a' &&
+                        metaData[metaCounter - 6] == 't' && metaData[metaCounter - 7] == 'a' && metaData[metaCounter - 8] == 'd') {
                     start = true;
                 }
 
@@ -148,8 +141,6 @@ public class WafToWarc {
                     contentLenght = 0;
                     metaCounter = 0;
                     metaData = new byte[100];
-                    inputStartList.clear();
-
                 }
             }
 
@@ -166,14 +157,13 @@ public class WafToWarc {
         return warcFileToReturn;
     }
 
-    private void addToWarcFile(byte[] bytesToAdd){
+    private void addToWarcFile(byte[] bytesToAdd) {
         for (int i = 0; i < bytesToAdd.length; i++) {
             if (warcFile.length <= bytesToAdd.length + warcFilePointer) {
                 warcFile = Service.growByteArray(warcFile);
             }
             warcFile[warcFilePointer] = bytesToAdd[i];
             warcFilePointer++;
-
         }
     }
 
@@ -192,7 +182,7 @@ public class WafToWarc {
                 "\r\n").getBytes();
 
         byte[] bytesToReturn = new byte[metaCounter + metaHeader.length];
-        for(int i = 0; i<metaHeader.length;i++){
+        for (int i = 0; i < metaHeader.length; i++) {
             bytesToReturn[i] = metaHeader[i];
         }
         System.arraycopy(metaData, 0, bytesToReturn, metaHeader.length, metaCounter);
