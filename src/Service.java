@@ -12,11 +12,8 @@ public class Service {
 
     private DateFormat dateFormat;
     private WafToWarc wafToWarc;
-    private int stillGoing = 0;
-    private boolean warcInfo = false;
     private FileOutputStream outputStream;
-//    public static File srcFile;
-//    public static File fileToMake;
+    private long warcFileSize = 0;
 
     private UUID warcInfoId = UUID.randomUUID();
     private String warcInfoDate;
@@ -37,7 +34,7 @@ public class Service {
         return arrayToReturn;
     }
 
-    public byte[] warcInfo() {
+    private byte[] warcInfo() {
 
         String s = "WARC/1.0\r\n" +
                 "WARC-Type: warcinfo\r\n" +
@@ -52,9 +49,6 @@ public class Service {
         return s.getBytes();
     }
 
-    public void writeWarc(File srcFile) {
-
-    }
 
     //TODO only for waf files
     public void writeFile(File fToMake, File srcFile) {
@@ -68,7 +62,7 @@ public class Service {
             outputStream.write(warcInfo());
 
             if (srcFile.isDirectory()) {
-                recursiveConvert(srcFile);
+                recursiveConvert(srcFile, fToMake);
             } else {
                 byte[] b1 = wafToWarc.readWaf(srcFile, warcInfoId, date);
                 outputStream.write(b1);
@@ -79,17 +73,16 @@ public class Service {
         }
     }
 
-    private void recursiveConvert(File dirPath) {
+    private void recursiveConvert(File dirPath, File fToMake) {
         try {
             File f = dirPath;
             File[] files = f.listFiles();
+            int warcFileNumber = 1;
 
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
                     File file = files[i];
-//                String affix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1); //Waf har ikke affix tror jeg
                     if (file.isFile()) {
-//                    convert(file.getAbsolutePath());
                         FileInputStream fInput = new FileInputStream(file);
                         int content;
                         int counter = 0;
@@ -102,9 +95,20 @@ public class Service {
                             if (counter == 4 && (char) findAffix[counter - 1] == 'F' && (char) findAffix[counter - 2] == 'A' &&
                                     (char) findAffix[counter - 3] == 'W' && (char) findAffix[counter - 4] == '.') {
 
+                                System.out.println(file.getName());
                                 String date = dateFormat.format(new Date(file.lastModified()));
 
+                                wafToWarc = new WafToWarc();
                                 byte[] b1 = wafToWarc.readWaf(file, warcInfoId, date);
+
+                                warcFileSize = warcFileSize + b1.length;
+
+                                if(warcFileSize > 1073741824){
+                                    outputStream = new FileOutputStream(fToMake.toString()+warcFileNumber);
+                                    warcFileNumber++;
+                                    warcFileSize = b1.length;
+                                    outputStream.write(warcInfo());
+                                }
 
                                 outputStream.write(b1);
 
@@ -113,7 +117,7 @@ public class Service {
                     }
 
                     if (file.isDirectory()) {
-                        recursiveConvert(file);
+                        recursiveConvert(file, fToMake);
                     }
                 }
             }

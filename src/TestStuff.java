@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,15 +43,15 @@ public class TestStuff {
 //    }
 
     public static void main(String[] args) {
-        byte[] b = new byte[4];
-        b[0] = 'a';
-        b[1] = 'b';
-        b[3] = 'g';
-        int i = 0;
 
-        while (b[i] != 0){
-            System.out.println((char) b[i]);
-            i++;
+        try {
+            //TODO er muligvis ikke et problem for programmet der skal vise WARC filer at der kommer[DC_KEYWORD] men det er en ugyldig url så måske skal den kigges på
+            String s1 = "http://ad.se.doubleclick.net/adi/idg.dk.cw/Samfund;sz=336x280;pos=10;tile=10;ord=9816706;kw=";
+            String s2 = "[DC_KEYWORD]";
+            System.out.println(s1+s2);
+            System.out.println(s1+URLEncoder.encode(s2, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
     }
 

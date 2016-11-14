@@ -11,11 +11,11 @@ public class WafToWarc {
     private byte[] metaData = new byte[100];
     private int metaCounter = 0;
     private UUID responseId;
-    byte[] warcFile = new byte[2000];
-    int warcFilePointer = 0;
+    private byte[] warcFile = new byte[2000];
+    private int warcFilePointer = 0;
 
     public byte[] readWaf(File srcFile, UUID infoId, String date) {
-
+        System.out.println("Starting to convert a waf file");
         byte[] inputBytes = new byte[1000];
 
         try (FileInputStream fInputStream = new FileInputStream(srcFile)) {
@@ -44,7 +44,6 @@ public class WafToWarc {
 
                 //this method runs on the last byte of the file
                 if (fileLenght == whenDoesItStop) {
-                    System.out.println("ITS STOPPING");
                     byte[] lastMeta = metaDataRecord(date);
                     addToWarcFile(lastMeta);
                 }
@@ -140,6 +139,7 @@ public class WafToWarc {
         for (int i = 0; i < warcFilePointer; i++) {
             warcFileToReturn[i] = warcFile[i];
         }
+        System.out.println("Ending conversion");
         return warcFileToReturn;
     }
 
