@@ -191,26 +191,29 @@ public class WafToWarc {
     //Finds the url and mime type of the record from the cut off portion of the data that is not part of the content itself
     public String[] getUrlAndMime() {
         String[] stringToReturn = new String[2];
-        boolean http = false;
+        boolean url = false;
+        boolean urlFound = false;
         boolean mime = false;
-        int i = 0;
-        for (i = 0; i < metaData.length; i++) {
-            if (http) {
-                if (metaData[i] != 0) {
+        boolean mimeFound = false;
+        int i;
+        for (i = 0; i < metaData.length && !mimeFound; i++) {
+            if (url) {
+                while (metaData[i] != 0) {
                     if (stringToReturn[0] == null) { //fills the first space in the string with the relevant char instead of a null
                         stringToReturn[0] = (char) metaData[i] + "";
+                        i++;
                     } else {
                         stringToReturn[0] += (char) metaData[i];
+                        i++;
                     }
-                } else {
-                    http = false;
                 }
-
+                url = false;
+                urlFound = true;
             }
 
-            if (i > 2 && metaData[i] == 'l' && metaData[i - 1] == 'r' && metaData[i - 2] == 'u') {
+            if (!urlFound && i > 2 && metaData[i] == 'l' && metaData[i - 1] == 'r' && metaData[i - 2] == 'u') {
                 i = i + 5;
-                http = true;
+                url = true;
             }
 
             if (mime) {
@@ -222,10 +225,11 @@ public class WafToWarc {
                     }
                 } else {
                     mime = false;
+                    mimeFound = true;
                 }
             }
 
-            if (i >= 3 && !http && metaData[i] == 'e' && metaData[i - 1] == 'm' && metaData[i - 2] == 'i' && metaData[i - 3] == 'm') {
+            if (!mimeFound && i >= 3 && !url && metaData[i] == 'e' && metaData[i - 1] == 'm' && metaData[i - 2] == 'i' && metaData[i - 3] == 'm') {
                 i = i + 4;
                 mime = true;
             }
