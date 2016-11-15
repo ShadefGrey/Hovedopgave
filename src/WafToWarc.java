@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -230,6 +231,16 @@ public class WafToWarc {
             }
 
         }
+        //TODO might need to encode the url where there are fx "[" as they are illegal in an url according to jwat tools test
+//        if (stringToReturn[0].equals("http://ad.se.doubleclick.net/adi/idg.dk.cw/Samfund;sz=336x280;pos=10;tile=10;ord=9816706;kw=[DC_KEYWORD]")) {
+//            String s1 = "http://ad.se.doubleclick.net/adi/idg.dk.cw/Samfund;sz=336x280;pos=10;tile=10;ord=9816706;kw=";
+//            String s2 = "[DC_KEYWORD]";
+//            try {
+//                stringToReturn[0] = (s1+ URLEncoder.encode(s2, "UTF-8"));
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//        }
         return stringToReturn;
     }
 

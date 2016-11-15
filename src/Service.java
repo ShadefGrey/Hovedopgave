@@ -15,7 +15,7 @@ public class Service {
     private FileOutputStream outputStream;
     private long warcFileSize = 0;
 
-    private UUID warcInfoId = UUID.randomUUID();
+    private UUID warcInfoId;
     private String warcInfoDate;
 
     public Service() {
@@ -26,6 +26,7 @@ public class Service {
     }
 
 
+    //Takes an array and returns a new array twice the size, with the same content
     public static byte[] growByteArray(byte[] bArray) {
         byte[] arrayToReturn = new byte[bArray.length * 2];
         for (int i = 0; i < bArray.length; i++) {
@@ -34,8 +35,10 @@ public class Service {
         return arrayToReturn;
     }
 
+    //The warcinfo, to be added at the start of every WARC file
     private byte[] warcInfo() {
 
+        warcInfoId = UUID.randomUUID();
         String s = "WARC/1.0\r\n" +
                 "WARC-Type: warcinfo\r\n" +
                 "WARC-Record-ID: <urn:uuid:" + warcInfoId + ">\r\n" +
@@ -103,8 +106,9 @@ public class Service {
 
                                 warcFileSize = warcFileSize + b1.length;
 
-                                if(warcFileSize > 1073741824){
-                                    outputStream = new FileOutputStream(fToMake.toString()+warcFileNumber);
+                                if (warcFileSize > 107374182) { //1073741824 should be 1 GB
+                                    //TODO might need better file names
+                                    outputStream = new FileOutputStream(fToMake.toString().substring(0, (int) fToMake.length() - 5) + warcFileNumber + ".warc");
                                     warcFileNumber++;
                                     warcFileSize = b1.length;
                                     outputStream.write(warcInfo());

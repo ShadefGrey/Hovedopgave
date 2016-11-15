@@ -69,10 +69,10 @@ public class Main {
 //        File f = new File("C:\\Users\\ckha\\Desktop\\0QO35I~9");
 //        System.out.println(m.readWaf(f));
 
-//        Service service = new Service(); //Converter en enkelt waf fil
-//        File f = new File("C:\\Users\\ckha\\Desktop\\0QO35I~9");
-//        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test6.warc");
-//        service.writeFile(writeToFile, f);
+        Service service = new Service(); //Converter en enkelt waf fil
+        File f = new File("C:\\Users\\ckha\\Desktop\\0QO35I~9");
+        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test10.warc");
+        service.writeFile(writeToFile, f);
 
 
 //        Service service = new Service();  //Converter et directory med waf filer
@@ -80,10 +80,12 @@ public class Main {
 //        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test7.warc");
 //        service.writeFile(writeToFile, f);
 
-        Service service = new Service();  //Converter et directory med waf filer fra netarkiv-old
-        File f = new File("Z:\\fra_Niels_Brugger_2009_06_15\\Leveret fra Niels Bruegger, 090611\\Arkiverede netsteder (primær opbevaring)\\Arkiveret\\Arkiveret 020215-020612\\Diverse");
-        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test8.warc");
-        service.writeFile(writeToFile, f);
+//        Service service = new Service();  //Converter et directory med waf filer fra netarkiv-old
+//        File f = new File("Y:\\fra_Niels_Brugger_2009_06_15\\Leveret fra Niels Bruegger, 090611\\Arkiverede netsteder (primær opbevaring)\\Arkiveret\\Arkiveret 020215-020612\\Diverse\\Prissammenligninger");
+//        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test9.warc");
+//        service.writeFile(writeToFile, f);
+
+
     }
 
 

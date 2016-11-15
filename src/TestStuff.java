@@ -50,6 +50,7 @@ public class TestStuff {
             String s2 = "[DC_KEYWORD]";
             System.out.println(s1+s2);
             System.out.println(s1+URLEncoder.encode(s2, "UTF-8"));
+            System.out.println("http://www.a-paere.dk/mail_friend_form.asp?Redirect=%2FQuery%2FPaereWiz%2Fliste%2Easp%3F&Link=http%3A%2F%2Fwww%2Ea%2Dpaere%2Edk%2FQuery%2FPaereWiz%2Fliste%2Easp%3FPaereID%3D%26Info%3D%26Lampe%3D%26Search%3D%26PaereTypeID%3D%26Link%3D1%26SokkelTypeID%3D%26Effekt%3D%26Laengd%3D%26Diameter%3D%26todo%3D%26row%3D");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
