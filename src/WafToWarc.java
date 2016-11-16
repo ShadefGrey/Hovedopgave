@@ -16,8 +16,10 @@ public class WafToWarc {
     private UUID responseId;
     private byte[] warcFile = new byte[2000];
     private int warcFilePointer = 0;
+    private boolean encodeUrl = false;
 
-    public byte[] readWaf(File srcFile, UUID infoId, String date) {
+    public byte[] readWaf(File srcFile, UUID infoId, String date, boolean toEncode) {
+        encodeUrl = toEncode;
         System.out.println("Starting to convert a waf file");
         byte[] inputBytes = new byte[1000];
 
@@ -207,18 +209,20 @@ public class WafToWarc {
 
                         if (stringToReturn[0] == null) { //fills the first space in the string with the relevant char instead of a null
                             matcher = pattern.matcher((char) metaData[i] + "");
-                            if (matcher.find()) {
+                            if (matcher.find() || !encodeUrl) {
                                 stringToReturn[0] = (char) metaData[i] + "";
                             } else {
                                 stringToReturn[0] = URLEncoder.encode((char) metaData[i] + "", "UTF-8");
+                                System.out.println("its encoding");
                             }
                             i++;
                         } else {
                             matcher = pattern.matcher((char) metaData[i] + "");
-                            if (matcher.find()) {
+                            if (matcher.find() || !encodeUrl) {
                                 stringToReturn[0] += (char) metaData[i] + "";
                             } else {
                                 stringToReturn[0] += URLEncoder.encode((char) metaData[i] + "", "UTF-8");
+                                System.out.println("its encoding");
                             }
                             i++;
                         }

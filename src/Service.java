@@ -18,6 +18,8 @@ public class Service {
     private UUID warcInfoId;
     private String warcInfoDate;
 
+    private boolean encodeUrl = false;
+
     public Service() {
         wafToWarc = new WafToWarc();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -54,8 +56,10 @@ public class Service {
 
 
     //TODO only for waf files
-    public void writeFile(File fToMake, File srcFile) {
+    public void writeFile(File fToMake, File srcFile, boolean toEncode) {
         try {
+            encodeUrl = toEncode;
+
             String date = dateFormat.format(new Date(srcFile.lastModified()));
 
             if (!fToMake.exists()) {
@@ -67,7 +71,7 @@ public class Service {
             if (srcFile.isDirectory()) {
                 recursiveConvert(srcFile, fToMake);
             } else {
-                byte[] b1 = wafToWarc.readWaf(srcFile, warcInfoId, date);
+                byte[] b1 = wafToWarc.readWaf(srcFile, warcInfoId, date, encodeUrl);
                 outputStream.write(b1);
             }
             outputStream.close();
@@ -102,7 +106,7 @@ public class Service {
                                 String date = dateFormat.format(new Date(file.lastModified()));
 
                                 wafToWarc = new WafToWarc();
-                                byte[] b1 = wafToWarc.readWaf(file, warcInfoId, date);
+                                byte[] b1 = wafToWarc.readWaf(file, warcInfoId, date, encodeUrl);
 
                                 warcFileSize = warcFileSize + b1.length;
 
