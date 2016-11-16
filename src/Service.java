@@ -108,7 +108,7 @@ public class Service {
 
                                 if (warcFileSize > 107374182) { //1073741824 should be 1 GB
                                     //TODO might need better file names
-                                    outputStream = new FileOutputStream(fToMake.toString().substring(0, (int) fToMake.length() - 5) + warcFileNumber + ".warc");
+                                    outputStream = new FileOutputStream(fToMake.toString().substring(0, fToMake.toString().length() - 5) + warcFileNumber + ".warc");
                                     warcFileNumber++;
                                     warcFileSize = b1.length;
                                     outputStream.write(warcInfo());

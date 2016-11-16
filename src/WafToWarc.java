@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by l_ckha on 28-10-2016.
@@ -195,56 +197,64 @@ public class WafToWarc {
         boolean urlFound = false;
         boolean mime = false;
         boolean mimeFound = false;
+        Pattern pattern = Pattern.compile("([!#$&%-;=?_a-zA-Z~])");
+        Matcher matcher;
         int i;
-        for (i = 0; i < metaData.length && !mimeFound; i++) {
-            if (url) {
-                while (metaData[i] != 0) {
-                    if (stringToReturn[0] == null) { //fills the first space in the string with the relevant char instead of a null
-                        stringToReturn[0] = (char) metaData[i] + "";
-                        i++;
+        try {
+            for (i = 0; i < metaData.length && !mimeFound; i++) {
+                if (url) {
+                    while (metaData[i] != 0) {
+
+                        if (stringToReturn[0] == null) { //fills the first space in the string with the relevant char instead of a null
+                            matcher = pattern.matcher((char) metaData[i] + "");
+                            if (matcher.find()) {
+                                stringToReturn[0] = (char) metaData[i] + "";
+                            } else {
+                                stringToReturn[0] = URLEncoder.encode((char) metaData[i] + "", "UTF-8");
+                            }
+                            i++;
+                        } else {
+                            matcher = pattern.matcher((char) metaData[i] + "");
+                            if (matcher.find()) {
+                                stringToReturn[0] += (char) metaData[i] + "";
+                            } else {
+                                stringToReturn[0] += URLEncoder.encode((char) metaData[i] + "", "UTF-8");
+                            }
+                            i++;
+                        }
+                    }
+                    url = false;
+                    urlFound = true;
+                }
+
+                if (!urlFound && i > 2 && metaData[i] == 'l' && metaData[i - 1] == 'r' && metaData[i - 2] == 'u') {
+                    i = i + 5;
+                    url = true;
+                }
+
+                if (mime) {
+                    if (metaData[i] != 0) {
+                        if (stringToReturn[1] == null) {
+                            stringToReturn[1] = (char) metaData[i] + "";
+                        } else {
+                            stringToReturn[1] += (char) metaData[i];
+                        }
                     } else {
-                        stringToReturn[0] += (char) metaData[i];
-                        i++;
+                        mime = false;
+                        mimeFound = true;
                     }
                 }
-                url = false;
-                urlFound = true;
-            }
 
-            if (!urlFound && i > 2 && metaData[i] == 'l' && metaData[i - 1] == 'r' && metaData[i - 2] == 'u') {
-                i = i + 5;
-                url = true;
-            }
-
-            if (mime) {
-                if (metaData[i] != 0) {
-                    if (stringToReturn[1] == null) {
-                        stringToReturn[1] = (char) metaData[i] + "";
-                    } else {
-                        stringToReturn[1] += (char) metaData[i];
-                    }
-                } else {
-                    mime = false;
-                    mimeFound = true;
+                if (!mimeFound && i >= 3 && !url && metaData[i] == 'e' && metaData[i - 1] == 'm' && metaData[i - 2] == 'i' && metaData[i - 3] == 'm') {
+                    i = i + 4;
+                    mime = true;
                 }
-            }
 
-            if (!mimeFound && i >= 3 && !url && metaData[i] == 'e' && metaData[i - 1] == 'm' && metaData[i - 2] == 'i' && metaData[i - 3] == 'm') {
-                i = i + 4;
-                mime = true;
             }
-
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
-        //TODO might need to encode the url where there are fx "[" as they are illegal in an url according to jwat tools test
-//        if (stringToReturn[0].equals("http://ad.se.doubleclick.net/adi/idg.dk.cw/Samfund;sz=336x280;pos=10;tile=10;ord=9816706;kw=[DC_KEYWORD]")) {
-//            String s1 = "http://ad.se.doubleclick.net/adi/idg.dk.cw/Samfund;sz=336x280;pos=10;tile=10;ord=9816706;kw=";
-//            String s2 = "[DC_KEYWORD]";
-//            try {
-//                stringToReturn[0] = (s1+ URLEncoder.encode(s2, "UTF-8"));
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
-//        }
+
         return stringToReturn;
     }
 

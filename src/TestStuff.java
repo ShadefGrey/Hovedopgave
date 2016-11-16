@@ -1,13 +1,13 @@
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by l_ckha on 02-11-2016.
@@ -44,14 +44,31 @@ public class TestStuff {
 
     public static void main(String[] args) {
 
+//        try {
+//            //TODO er muligvis ikke et problem for programmet der skal vise WARC filer at der kommer[DC_KEYWORD] men det er en ugyldig url så måske skal den kigges på
+//            String s1 = "http://www.ask-alex.dk/read￥er/a\\a_print.html?ID=￥359&cat=B";
+//            String s2 = s1.replace("￥", URLEncoder.encode("￥", "UTF-8"));
+//            s2.replace('\\', '/');
+//            System.out.println(s1);
+//            System.out.println(s2);
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+        //"^([!#$&-;=?-\[\]_a-z~]|%[0-9a-fA-F]{2})+$"
+        //"^([!#$&-;=?-[]_a-z~]|%[0-9a-fA-F]{2})+$"
+        byte[] line = "http://radio-tv.sparel.dk/search/searchadvanced.asp?ProduktGruppeID=2".getBytes();
+        Pattern pattern = Pattern.compile("([!#$&%-;=?_a-zA-Z~])");
+        Matcher matcher;
         try {
-            //TODO er muligvis ikke et problem for programmet der skal vise WARC filer at der kommer[DC_KEYWORD] men det er en ugyldig url så måske skal den kigges på
-            String s1 = "http://ad.se.doubleclick.net/adi/idg.dk.cw/Samfund;sz=336x280;pos=10;tile=10;ord=9816706;kw=";
-            String s2 = "[DC_KEYWORD]";
-            System.out.println(s1+s2);
-            System.out.println(s1+URLEncoder.encode(s2, "UTF-8"));
-            System.out.println("http://www.a-paere.dk/mail_friend_form.asp?Redirect=%2FQuery%2FPaereWiz%2Fliste%2Easp%3F&Link=http%3A%2F%2Fwww%2Ea%2Dpaere%2Edk%2FQuery%2FPaereWiz%2Fliste%2Easp%3FPaereID%3D%26Info%3D%26Lampe%3D%26Search%3D%26PaereTypeID%3D%26Link%3D1%26SokkelTypeID%3D%26Effekt%3D%26Laengd%3D%26Diameter%3D%26todo%3D%26row%3D");
-        } catch (UnsupportedEncodingException e) {
+            for (int i = 0; i < line.length; i++) {
+                matcher = pattern.matcher((char) line[i] + "");
+                if (matcher.find()) {
+                    System.out.print((char) line[i]);
+                } else {
+                    System.out.print(URLEncoder.encode((char) line[i] + "", "UTF-8"));
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
