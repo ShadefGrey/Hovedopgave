@@ -135,6 +135,7 @@ public class WafToWarc {
                     metaData = new byte[100];
                 }
             }
+            fInputStream.close();
 
         } catch (IOException e) {
             e.printStackTrace();

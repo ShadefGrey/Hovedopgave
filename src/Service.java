@@ -76,37 +76,63 @@ public class Service {
                 dir.createNewFile();
             }
 
-            outputStream = new FileOutputStream(dir.toString()+ "\\" + wfn);
+            outputStream = new FileOutputStream(dir.toString() + "\\" + wfn);
             outputStream.write(warcInfo());
 
             if (srcFile.isDirectory()) {
-                recursiveConvert(srcFile, new File(dir.toString()+ "\\" + wfn));
+                recursiveConvert(srcFile, new File(dir.toString() + "\\" + wfn));
             } else {
                 byte[] b1 = wafToWarc.readWaf(srcFile, warcInfoId, date, encodeUrl);
                 outputStream.write(b1);
             }
 
+            jwattWarcTest(dirToMake, wfn);
 
+            outputStream.close();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Runs the JWAT tools warc test on the directory with the newly created WARC files
+    private void jwattWarcTest(File dirToMake, String fileName) {
+        try {
+            //The arguments needed, that normally comes from the shell command
             String[] argmnts = new String[3];
             argmnts[0] = "test";
             argmnts[1] = "-e";
             argmnts[2] = dirToMake.toString();
             JWATTools.main(argmnts);
 
-            FileInputStream ifile = new FileInputStream(System.getProperty("user.dir") + "\\i.out");
-            FileOutputStream outputfile = new FileOutputStream(dirToMake + "\\" + wfn + ".i.out");
+            //Takes the error messages from the file created by JWAT tools and write it to a file we create
+            FileInputStream ifile = new FileInputStream("i.out");
+            FileOutputStream outputfile = new FileOutputStream(dirToMake + "\\" + fileName + ".i.out");
             int content;
             while ((content = ifile.read()) != -1) {
                 outputfile.write((byte) content);
             }
 
+            outputfile.close();
+            ifile.close();
 
-            outputStream.close();
+            //deletes the files that jwatt tools automatically creates. Instead a file with the error messages can be found in the directory of the newly created WARC files
+            if (new File("e.out").exists()) {
+                new File("e.out").delete();
+            }
+            if (new File("i.out").exists()) {
+                new File("i.out").delete();
+            }
+            if (new File("v.out").exists()) {
+                new File("v.out").delete();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    //A recursive function that checks every file and directory inside it and uses wafToWarc on any waf file found.
     private void recursiveConvert(File dirPath, File fToMake) {
         try {
             File f = dirPath;
@@ -149,6 +175,7 @@ public class Service {
 
                             }
                         }
+                        fInput.close();
                     }
 
                     if (file.isDirectory()) {

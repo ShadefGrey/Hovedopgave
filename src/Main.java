@@ -32,8 +32,8 @@ public class Main {
         Service service = new Service();  //Converter et directory med waf filer fra netarkiv-old
         File f = new File("Z:\\\\fra_Niels_Brugger_2009_06_15\\\\Leveret fra Niels Bruegger, 090611\\\\Arkiverede netsteder (primær opbevaring)\\\\Arkiveret\\\\Arkiveret 020215-020612\\\\Diverse\\\\Prissammenligninger");
         File dirToMake = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testDir");
-        String warFileName = "testMore";
-        service.writeFile(f, dirToMake, warFileName, true);
+        String warFileName = "testNoEncode";
+        service.writeFile(f, dirToMake, warFileName, false);
 
 
     }
