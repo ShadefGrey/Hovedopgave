@@ -1,5 +1,12 @@
+import org.jwat.tools.JWATTools;
+import org.jwat.tools.core.CommandLine;
+import org.jwat.tools.tasks.test.TestFileResult;
+import org.jwat.tools.tasks.test.TestTask;
+import org.jwat.warc.WarcRecord;
+
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -8,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.jwat.tools.tasks.test.TestFileResult.showDiagnosisList;
 
 /**
  * Created by l_ckha on 02-11-2016.
@@ -36,11 +45,12 @@ public class TestStuff {
 //            "\n" +
 //            "\n";
 
-//    public static void main(String[] args) { //TODO check rekursiv (skal gøres public før tjek)
+    //    public static void main(String[] args) { //TODO check rekursiv (skal gøres public før tjek)
 //        Service s = new Service();
 //        File f = new File("C:\\Users\\ckha\\Desktop\\En waf fil");
 //        s.recursiveConvert(f);
 //    }
+
 
     public static void main(String[] args) {
 
@@ -56,22 +66,29 @@ public class TestStuff {
 //        }
         //"^([!#$&-;=?-\[\]_a-z~]|%[0-9a-fA-F]{2})+$"
         //"^([!#$&-;=?-[]_a-z~]|%[0-9a-fA-F]{2})+$"
-        byte[] line = "http://radio-tv.sparel.dk/search/searchadvanced.asp?ProduktGruppeID=2".getBytes();
-        Pattern pattern = Pattern.compile("([!#$&%-;=?_a-zA-Z~])");
-        Matcher matcher;
-        try {
-            for (int i = 0; i < line.length; i++) {
-                matcher = pattern.matcher((char) line[i] + "");
-                if (matcher.find()) {
-                    System.out.print((char) line[i]);
-                } else {
-                    System.out.print(URLEncoder.encode((char) line[i] + "", "UTF-8"));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
+
+        String fPath = "C:\\Users\\ckha\\Desktop\\testingstuffdir";
+        String fPath2 = "C:\\Users\\ckha\\Desktop\\WAFtoWarcTest\\test2.warc";
+        String[] paths = new String[2];
+        paths[0] = fPath;
+        paths[1] = fPath2;
+        String[] argmnts = new String[3];
+        argmnts[0] = "test";
+        argmnts[1] = "-e";
+        argmnts[2] = fPath;
+        JWATTools.main(argmnts);
+
+//        File f = new File(fPath);
+//        f.mkdir();
+//        Thread t1 = new Thread(() -> JWATTools.main(argmnts));
+//        t1.start();
+
+        System.out.println("WHATUP");
+
+//        JWATTools.main(argmnts);
+
+
+    }
 
 }

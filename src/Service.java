@@ -1,3 +1,5 @@
+import org.jwat.tools.JWATTools;
+
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -56,24 +58,49 @@ public class Service {
 
 
     //TODO only for waf files
-    public void writeFile(File fToMake, File srcFile, boolean toEncode) {
+    public void writeFile(File srcFile, File dirToMake, String warcFileName, boolean toEncode) {
         try {
+            String wfn = warcFileName;
+            File dir = dirToMake;
+            dir.mkdir();
+
+            if (!wfn.substring(dirToMake.getName().lastIndexOf(".") + 1).equals("warc")) {
+                wfn += ".warc";
+            }
+
             encodeUrl = toEncode;
 
             String date = dateFormat.format(new Date(srcFile.lastModified()));
 
-            if (!fToMake.exists()) {
-                fToMake.createNewFile();
+            if (!dir.exists()) {
+                dir.createNewFile();
             }
-            outputStream = new FileOutputStream(fToMake);
+
+            outputStream = new FileOutputStream(dir.toString()+ "\\" + wfn);
             outputStream.write(warcInfo());
 
             if (srcFile.isDirectory()) {
-                recursiveConvert(srcFile, fToMake);
+                recursiveConvert(srcFile, new File(dir.toString()+ "\\" + wfn));
             } else {
                 byte[] b1 = wafToWarc.readWaf(srcFile, warcInfoId, date, encodeUrl);
                 outputStream.write(b1);
             }
+
+
+            String[] argmnts = new String[3];
+            argmnts[0] = "test";
+            argmnts[1] = "-e";
+            argmnts[2] = dirToMake.toString();
+            JWATTools.main(argmnts);
+
+            FileInputStream ifile = new FileInputStream(System.getProperty("user.dir") + "\\i.out");
+            FileOutputStream outputfile = new FileOutputStream(dirToMake + "\\" + wfn + ".i.out");
+            int content;
+            while ((content = ifile.read()) != -1) {
+                outputfile.write((byte) content);
+            }
+
+
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();

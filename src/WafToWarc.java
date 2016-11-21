@@ -199,6 +199,8 @@ public class WafToWarc {
         boolean urlFound = false;
         boolean mime = false;
         boolean mimeFound = false;
+
+        //Regex pattern the url should match
         Pattern pattern = Pattern.compile("([!#$&%-;=?_a-zA-Z~])");
         Matcher matcher;
         int i;
@@ -269,6 +271,8 @@ public class WafToWarc {
         String[] urlAndMime = getUrlAndMime();
         String http;
 
+
+        //TODO it will most likely always be 200 OK even if it should have been 404 Not found. Conent lenght is not the right way to check
         if (contentLenght > 0) {
             http = "HTTP/1.1 200 OK\r\n" + "Content-Type: " +
                     urlAndMime[1] +
