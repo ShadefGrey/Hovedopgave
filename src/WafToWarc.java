@@ -201,8 +201,8 @@ public class WafToWarc {
         boolean mime = false;
         boolean mimeFound = false;
 
-        //Regex pattern the url should match
-        Pattern pattern = Pattern.compile("([!#$&%-;=?_a-zA-Z~])");
+        //Regex pattern the url should match (only checks for legal characters in the url and not if the url itself is legal)
+        Pattern pattern = Pattern.compile("([!#$&%-;=@?_a-zA-Z~])");
         Matcher matcher;
         int i;
         try {
@@ -258,11 +258,14 @@ public class WafToWarc {
                 }
 
             }
+            if (stringToReturn[1] == null) {
+                stringToReturn[1] = "application/octet-stream";
+            }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
         return stringToReturn;
+
     }
 
     //returns a byte[] consisting of a response WARC record with header and content
@@ -273,7 +276,7 @@ public class WafToWarc {
         String http;
 
 
-        //TODO it will most likely always be 200 OK even if it should have been 404 Not found. Conent lenght is not the right way to check
+        //TODO it will almost always be 200 OK even if it should have been 404 Not found. Conent lenght is not the right way to check
         if (contentLenght > 0) {
             http = "HTTP/1.1 200 OK\r\n" + "Content-Type: " +
                     urlAndMime[1] +

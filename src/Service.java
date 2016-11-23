@@ -16,7 +16,7 @@ public class Service {
     private WafToWarc wafToWarc;
     private FileOutputStream outputStream;
     private long warcFileSize = 0;
-
+    private int warcFileNumber = 1;
     private UUID warcInfoId;
     private String warcInfoDate;
 
@@ -57,7 +57,7 @@ public class Service {
     }
 
 
-    //TODO only for waf files
+    //Only for waf files
     public void writeFile(File srcFile, File dirToMake, String warcFileName, boolean toEncode) {
         try {
             String wfn = warcFileName;
@@ -99,7 +99,7 @@ public class Service {
     //Runs the JWAT tools warc test on the directory with the newly created WARC files
     private void jwattWarcTest(File dirToMake, String fileName) {
         try {
-            //The arguments needed, that normally comes from the shell command
+            //The arguments needed for JWAT test, that normally comes from the shell command
             String[] argmnts = new String[3];
             argmnts[0] = "test";
             argmnts[1] = "-e";
@@ -137,7 +137,6 @@ public class Service {
         try {
             File f = dirPath;
             File[] files = f.listFiles();
-            int warcFileNumber = 1;
 
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
@@ -164,7 +163,6 @@ public class Service {
                                 warcFileSize = warcFileSize + b1.length;
 
                                 if (warcFileSize > 107374182) { //1073741824 should be 1 GB
-                                    //TODO might need better file names
                                     outputStream = new FileOutputStream(fToMake.toString().substring(0, fToMake.toString().length() - 5) + warcFileNumber + ".warc");
                                     warcFileNumber++;
                                     warcFileSize = b1.length;

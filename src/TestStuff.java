@@ -45,7 +45,7 @@ public class TestStuff {
 //            "\n" +
 //            "\n";
 
-    //    public static void main(String[] args) { //TODO check rekursiv (skal gøres public før tjek)
+    //    public static void main(String[] args) {
 //        Service s = new Service();
 //        File f = new File("C:\\Users\\ckha\\Desktop\\En waf fil");
 //        s.recursiveConvert(f);
@@ -55,7 +55,6 @@ public class TestStuff {
     public static void main(String[] args) {
 
 //        try {
-//            //TODO er muligvis ikke et problem for programmet der skal vise WARC filer at der kommer[DC_KEYWORD] men det er en ugyldig url så måske skal den kigges på
 //            String s1 = "http://www.ask-alex.dk/read￥er/a\\a_print.html?ID=￥359&cat=B";
 //            String s2 = s1.replace("￥", URLEncoder.encode("￥", "UTF-8"));
 //            s2.replace('\\', '/');
@@ -75,16 +74,6 @@ public class TestStuff {
         argmnts[2] = fPath;
 
 //        JWATTools.main(argmnts);
-
-//        if(new File("e.out").exists()){
-//            new File("e.out").delete();
-//        }
-        if(new File("i.out").exists()){
-            new File("i.out").delete();
-        }
-//        if(new File("v.out").exists()){
-//            new File("v.out").delete();
-//        }
 
 
 //        File f = new File(fPath);
