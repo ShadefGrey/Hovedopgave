@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class WafToWarc {
 
     //TODO cate nul nul nul, er slutning, start på næste er lige efter
-    private int contentLenght;
+    private int contentLength;
     private byte[] metaData = new byte[100];
     private int metaCounter = 0;
     private UUID responseId;
@@ -57,31 +57,37 @@ public class WafToWarc {
                 //starts when the inputstream is at the content of what will be a WARC record.
                 //Adds the content to an array
                 if (start) {
-                    if (inputBytes.length <= contentLenght) {
+                    if (inputBytes.length <= contentLength) {
                         inputBytes = Service.growByteArray(inputBytes);
                     }
-                    inputBytes[contentLenght] = (byte) content;
-                    contentLenght++;
+                    inputBytes[contentLength] = (byte) content;
+                    contentLength++;
                     int metaEndToAdd = 0;
 
-                    if (contentLenght >= 7 && inputBytes[contentLenght - 1] == 0 && inputBytes[contentLenght - 2] == 0 &&
-                            inputBytes[contentLenght - 3] == 0 && inputBytes[contentLenght - 4] == 'e' && inputBytes[contentLenght - 5] == 't' && inputBytes[contentLenght - 6] == 'a' &&
-                            inputBytes[contentLenght - 7] == 'c') {
-                        contentLenght = contentLenght - 6;
+                    if (contentLength >= 7 && inputBytes[contentLength - 1] == 0 && inputBytes[contentLength - 2] == 0 &&
+                            inputBytes[contentLength - 3] == 0 && inputBytes[contentLength - 4] == 'e' && inputBytes[contentLength - 5] == 't' && inputBytes[contentLength - 6] == 'a' &&
+                            inputBytes[contentLength - 7] == 'c') {
+                        contentLength = contentLength - 6;
                         metaEndToAdd = metaEndToAdd + 6;
-                        for (int i = contentLenght; i >= 4 && !cutPost; i--) {
-                            contentLenght--;
+                        for (int i = contentLength; i >= 4 && !cutPost; i--) {
+                            contentLength--;
+
+
                             metaEndToAdd++;
                             if (inputBytes[i - 1] == 't' && inputBytes[i - 2] == 's' && inputBytes[i - 3] == 'o' && inputBytes[i - 4] == 'p') {
                                 cutPost = true;
                                 stop = true;
-                                contentLenght = contentLenght - 4;
+                                contentLength = contentLength - 4;
                                 metaEndToAdd = metaEndToAdd + 4;
                             }
                         }
 
-                        int i = contentLenght;
+                        //contentlength can be -1 when the content is empty, this fixes it.
+                        if (contentLength < 0) {
+                            contentLength = 0;
+                        }
 
+                        int i = contentLength;
                         //adds the data after content, but before the next record, to metadata
                         while (metaEndToAdd > 0) {
                             if (metaData.length <= metaCounter) {
@@ -107,10 +113,10 @@ public class WafToWarc {
                 //this runs when all the content of a single record has been found.
                 //it adds response and metadata Warc record to the WARC file
                 if (stop) {
-                    byte[] contentArray = new byte[contentLenght];
+                    byte[] contentArray = new byte[contentLength];
 
                     //copies the content from the response WARC record array into a new array that does not have the extra NULs
-                    System.arraycopy(inputBytes, 0, contentArray, 0, contentLenght);
+                    System.arraycopy(inputBytes, 0, contentArray, 0, contentLength);
 
                     byte[] tmpWarcFile = warcRecord(infoId, date, contentArray);
 
@@ -128,9 +134,9 @@ public class WafToWarc {
                     cutPost = false;
                     start = false;
                     stop = false;
-                    contentLenght = 0;
+                    contentLength = 0;
                     inputBytes = new byte[1000];
-                    contentLenght = 0;
+                    contentLength = 0;
                     metaCounter = 0;
                     metaData = new byte[100];
                 }
@@ -277,7 +283,7 @@ public class WafToWarc {
 
 
         //TODO it will almost always be 200 OK even if it should have been 404 Not found. Conent lenght is not the right way to check
-        if (contentLenght > 0) {
+        if (contentLength > 0) {
             http = "HTTP/1.1 200 OK\r\n" + "Content-Type: " +
                     urlAndMime[1] +
                     "\r\n" +
@@ -288,7 +294,7 @@ public class WafToWarc {
                     "\r\n" +
                     "\r\n";
         }
-        contentLenght = contentLenght + http.getBytes().length;
+        contentLength = contentLength + http.getBytes().length;
 
         String warcHeader = "WARC/1.0\r\n" +
                 "WARC-Type: response\r\n" +
@@ -299,7 +305,7 @@ public class WafToWarc {
                 "WARC-Record-ID: <urn:uuid:" + responseId + ">\r\n" +
                 "Content-Type: application/http;msgtype=response\r\n" +
                 "WARC-Identified-Payload-Type: " + urlAndMime[1] + "\r\n" +
-                "Content-Length: " + contentLenght +
+                "Content-Length: " + contentLength +
                 "\r\n" +
                 "\r\n";
 

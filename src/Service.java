@@ -162,8 +162,8 @@ public class Service {
 
                                 warcFileSize = warcFileSize + b1.length;
 
-                                if (warcFileSize > 107374182) { //1073741824 should be 1 GB
-                                    outputStream = new FileOutputStream(fToMake.toString().substring(0, fToMake.toString().length() - 5) + warcFileNumber + ".warc");
+                                if (warcFileSize > 1073741824 ) { //1073741824 should be 1 GB
+                                    outputStream = new FileOutputStream(fToMake.toString().substring(0, fToMake.toString().length() - 5) + "(" + warcFileNumber + ").warc");
                                     warcFileNumber++;
                                     warcFileSize = b1.length;
                                     outputStream.write(warcInfo());

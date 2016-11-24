@@ -67,22 +67,11 @@ public class TestStuff {
         //"^([!#$&-;=?-[]_a-z~]|%[0-9a-fA-F]{2})+$"
 
 
-        String fPath = "C:\\Users\\ckha\\Desktop\\WAFtoWarcTest\\test2.warc";
-        String[] argmnts = new String[3];
-        argmnts[0] = "test";
-        argmnts[1] = "-e";
-        argmnts[2] = fPath;
-
-//        JWATTools.main(argmnts);
-
-
-//        File f = new File(fPath);
-//        f.mkdir();
-//        Thread t1 = new Thread(() -> JWATTools.main(argmnts));
-//        t1.start();
-        System.out.println("WHATUP");
-
-
+//        String fPath = "C:\\Users\\ckha\\Desktop\\WAFtoWarcTest\\test2.warc";
+//        String[] argmnts = new String[3];
+//        argmnts[0] = "test";
+//        argmnts[1] = "-e";
+//        argmnts[2] = fPath;
 
     }
 
