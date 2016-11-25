@@ -209,6 +209,7 @@ public class WafToWarc {
 
         //Regex pattern the url should match (only checks for legal characters in the url and not if the url itself is legal)
         Pattern pattern = Pattern.compile("([!#$&%-;=@?_a-zA-Z~])");
+        Pattern mimePattern = Pattern.compile("([a-z])+/([a-z+-])+(\\d){0,2}");
         Matcher matcher;
         int i;
         try {
@@ -264,7 +265,12 @@ public class WafToWarc {
                 }
 
             }
+            matcher = mimePattern.matcher(stringToReturn[1]);
             if (stringToReturn[1] == null) {
+                stringToReturn[1] = "application/octet-stream";
+            }
+            //sets the mimetype to application/octet-stream if it doesnt match what is expected of a mimetype
+            else if (!matcher.matches()) {
                 stringToReturn[1] = "application/octet-stream";
             }
         } catch (UnsupportedEncodingException e) {

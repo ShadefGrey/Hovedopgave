@@ -72,7 +72,13 @@ public class TestStuff {
 //        argmnts[0] = "test";
 //        argmnts[1] = "-e";
 //        argmnts[2] = fPath;
+        Pattern pattern = Pattern.compile("([!#$&%-;=@?_a-zA-Z~])");
 
+        Pattern mimePattern = Pattern.compile("([a-z])+/([a-z+-])+(\\d){0,2}");
+
+        Matcher matcher;
+        matcher = mimePattern.matcher("gfh/ert");
+        System.out.println(matcher.matches());
     }
 
 }
