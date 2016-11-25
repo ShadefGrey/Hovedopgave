@@ -265,12 +265,13 @@ public class WafToWarc {
                 }
 
             }
-            matcher = mimePattern.matcher(stringToReturn[1]);
+
             if (stringToReturn[1] == null) {
                 stringToReturn[1] = "application/octet-stream";
             }
             //sets the mimetype to application/octet-stream if it doesnt match what is expected of a mimetype
-            else if (!matcher.matches()) {
+            matcher = mimePattern.matcher(stringToReturn[1]);
+            if (!matcher.matches()) {
                 stringToReturn[1] = "application/octet-stream";
             }
         } catch (UnsupportedEncodingException e) {
