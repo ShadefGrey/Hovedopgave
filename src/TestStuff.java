@@ -4,10 +4,7 @@ import org.jwat.tools.tasks.test.TestFileResult;
 import org.jwat.tools.tasks.test.TestTask;
 import org.jwat.warc.WarcRecord;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -72,13 +69,31 @@ public class TestStuff {
 //        argmnts[0] = "test";
 //        argmnts[1] = "-e";
 //        argmnts[2] = fPath;
-        Pattern pattern = Pattern.compile("([!#$&%-;=@?_a-zA-Z~])");
 
-        Pattern mimePattern = Pattern.compile("([a-z])+/([a-z+-])+(\\d){0,2}");
 
-        Matcher matcher;
-        matcher = mimePattern.matcher("gfh/ert");
-        System.out.println(matcher.matches());
+//        Pattern pattern = Pattern.compile("([!#$&%-;=@?_a-zA-Z~])");
+//
+//        Pattern mimePattern = Pattern.compile("([a-z])+/([a-z+-])+(\\d){0,2}");
+//
+//        Matcher matcher;
+//        matcher = mimePattern.matcher("gfh/ert");
+//        System.out.println(matcher.matches());
+
+//       String s = "C:\\Users\\ckha\\Desktop\\WAFtoWarcTest\\testTheThing\\test";
+//        try {
+//            FileInputStream fi = new FileInputStream(new File(s));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+
+        Service s = new Service();
+        File dir = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testTheOtherThing");
+        try {
+            System.out.println(s.getWarcUrls(dir));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

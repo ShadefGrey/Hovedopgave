@@ -3,6 +3,7 @@ import org.jwat.tools.JWATTools;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -19,6 +20,8 @@ public class Service {
     private int warcFileNumber = 1;
     private UUID warcInfoId;
     private String warcInfoDate;
+    //    private ArrayList<String> allWafUrls = new ArrayList<>();
+    private String allWafUrls = "";
 
     private boolean encodeUrl = false;
 
@@ -56,6 +59,49 @@ public class Service {
         return s.getBytes();
     }
 
+    public String getWarcUrls(File dirFile) throws IOException {
+        String warcUrls = "";
+        int numberofurls = 0;
+        if (dirFile.isDirectory()) {
+            File[] files = dirFile.listFiles();
+
+
+            for (File f : files) {
+                //WARC-Target-URI:
+                if (f.getName().substring(f.getName().length() - 4).equals("warc")) {
+                    System.out.println(f.getName());
+                    boolean urlFound = false;
+                    String stringUrl = "";
+//                byte[] byteUrl = new byte[100];
+                    int content;
+                    FileInputStream fi = new FileInputStream(f);
+
+                    while ((content = fi.read()) != -1) {
+                        if (urlFound) {
+                            if ((char) content != '\r') {
+                                warcUrls += (char) content;
+                            } else {
+                                urlFound = false;
+                                warcUrls += "\n";
+                                numberofurls++;
+                                System.out.println("******************" + numberofurls + "*******************************");
+                            }
+                        }
+
+                        stringUrl += (char) content;
+                        if ((char) content == ' ' && stringUrl.length() >= 17 && stringUrl.substring(stringUrl.length() - 17).equals("WARC-Target-URI: ")) {
+//                        if (stringUrl.contains("WARC-Target-URI: ")) {
+                            urlFound = true;
+                            stringUrl = "";
+                        }
+                    }
+
+                }
+            }
+        }
+        return warcUrls;
+    }
+
 
     //Only for waf files
     public void writeFile(File srcFile, File dirToMake, String warcFileName, boolean toEncode) {
@@ -83,6 +129,7 @@ public class Service {
                 recursiveConvert(srcFile, new File(dir.toString() + "\\" + wfn));
             } else {
                 byte[] b1 = wafToWarc.readWaf(srcFile, warcInfoId, date, encodeUrl);
+                allWafUrls += wafToWarc.getWafUrls();
                 outputStream.write(b1);
             }
 
@@ -94,6 +141,10 @@ public class Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void urlsToBytes() {
+
     }
 
     //Runs the JWAT tools warc test on the directory with the newly created WARC files
@@ -114,6 +165,12 @@ public class Service {
                 outputfile.write((byte) content);
             }
 
+            //TODO url output
+            File urlfile = new File(dirToMake.toString() + "\\urls.txt");
+            FileOutputStream urlout = new FileOutputStream(urlfile);
+            urlout.write(allWafUrls.getBytes());
+
+
             outputfile.close();
             ifile.close();
 
@@ -127,6 +184,7 @@ public class Service {
             if (new File("v.out").exists()) {
                 new File("v.out").delete();
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -154,16 +212,21 @@ public class Service {
                             if (counter == 4 && (char) findAffix[counter - 1] == 'F' && (char) findAffix[counter - 2] == 'A' &&
                                     (char) findAffix[counter - 3] == 'W' && (char) findAffix[counter - 4] == '.') {
 
+                                String warcFileName = fToMake.toString();
+
                                 System.out.println(file.getName());
                                 String date = dateFormat.format(new Date(file.lastModified()));
 
                                 wafToWarc = new WafToWarc();
                                 byte[] b1 = wafToWarc.readWaf(file, warcInfoId, date, encodeUrl);
+                                allWafUrls += wafToWarc.getWafUrls();
 
                                 warcFileSize = warcFileSize + b1.length;
 
-                                if (warcFileSize > 1073741824 ) { //1073741824 should be 1 GB
-                                    outputStream = new FileOutputStream(fToMake.toString().substring(0, fToMake.toString().length() - 5) + "(" + warcFileNumber + ").warc");
+                                if (warcFileSize > 1073741824) { //1073741824 should be 1 GB
+                                    warcFileName = fToMake.toString().substring(0, fToMake.toString().length() - 5) + "(" + warcFileNumber + ").warc";
+
+                                    outputStream = new FileOutputStream(warcFileName);
                                     warcFileNumber++;
                                     warcFileSize = b1.length;
                                     outputStream.write(warcInfo());

@@ -30,8 +30,8 @@ public class Main {
 //        service.writeFile(writeToFile, f);
 
         Service service = new Service();  //Converter et directory med waf filer fra netarkiv-old
-        File f = new File("\\\\thiele\\netarkiv-old\\fra_Niels_Brugger_2009_06_15\\Leveret fra Niels Bruegger, 090611\\Arkiverede netsteder (primær opbevaring)\\Arkiveret\\Arkiveret 020612-050322\\DR\\DR\\DIS7KF~7");
-        File dirToMake = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testTheThing");
+        File f = new File("C:\\Users\\ckha\\Desktop\\En waf fil");
+        File dirToMake = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testTheOtherThing");
         String warFileName = "test";
         service.writeFile(f, dirToMake, warFileName, true);
 

@@ -17,6 +17,12 @@ public class WafToWarc {
     private byte[] warcFile = new byte[2000];
     private int warcFilePointer = 0;
     private boolean encodeUrl = false;
+    //    private ArrayList<String> wafUrls = new ArrayList<>();
+    private String wafUrls = "";
+
+    public String getWafUrls() {
+        return wafUrls;
+    }
 
     public byte[] readWaf(File srcFile, UUID infoId, String date, boolean toEncode) {
         encodeUrl = toEncode;
@@ -277,6 +283,7 @@ public class WafToWarc {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        wafUrls += stringToReturn[0] + "\n";
         return stringToReturn;
 
     }
