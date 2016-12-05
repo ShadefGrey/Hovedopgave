@@ -89,7 +89,9 @@ public class TestStuff {
         Service s = new Service();
         File dir = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testTheOtherThing");
         try {
-            System.out.println(s.getWarcUrls(dir));
+            FileOutputStream fo = new FileOutputStream(dir.getPath()+"/warcUrls");
+            fo.write(s.getWarcUrls(dir).getBytes());
+//            System.out.println(s.getWarcUrls(dir));
         } catch (Exception e) {
             e.printStackTrace();
         }

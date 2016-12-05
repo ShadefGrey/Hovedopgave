@@ -59,6 +59,7 @@ public class Service {
         return s.getBytes();
     }
 
+
     public String getWarcUrls(File dirFile) throws IOException {
         String warcUrls = "";
         int numberofurls = 0;
@@ -67,12 +68,12 @@ public class Service {
 
 
             for (File f : files) {
-                //WARC-Target-URI:
                 if (f.getName().substring(f.getName().length() - 4).equals("warc")) {
                     System.out.println(f.getName());
                     boolean urlFound = false;
-                    String stringUrl = "";
-//                byte[] byteUrl = new byte[100];
+                    byte[] byteUrl = new byte[1000];
+                    int byteIndex = 0;
+
                     int content;
                     FileInputStream fi = new FileInputStream(f);
 
@@ -87,12 +88,20 @@ public class Service {
                                 System.out.println("******************" + numberofurls + "*******************************");
                             }
                         }
+                        if (byteIndex >= byteUrl.length) {
+                            byteUrl = growByteArray(byteUrl);
+                        }
+                        byteUrl[byteIndex] = (byte) content;
+//                        System.out.println((char) byteUrl[byteIndex]);
+                        byteIndex++;
 
-                        stringUrl += (char) content;
-                        if ((char) content == ' ' && stringUrl.length() >= 17 && stringUrl.substring(stringUrl.length() - 17).equals("WARC-Target-URI: ")) {
-//                        if (stringUrl.contains("WARC-Target-URI: ")) {
+                        if (!urlFound && (char) content == ' ' && byteIndex >= 17 && (char) byteUrl[byteIndex - 2] == ':' && (char) byteUrl[byteIndex - 3] == 'I' && (char) byteUrl[byteIndex - 4] == 'R' &&
+                                (char) byteUrl[byteIndex - 5] == 'U' && (char) byteUrl[byteIndex - 6] == '-' && (char) byteUrl[byteIndex - 7] == 't' && (char) byteUrl[byteIndex - 8] == 'e' &&
+                                (char) byteUrl[byteIndex - 9] == 'g' && (char) byteUrl[byteIndex - 10] == 'r' && (char) byteUrl[byteIndex - 11] == 'a' && (char) byteUrl[byteIndex - 12] == 'T' &&
+                                (char) byteUrl[byteIndex - 13] == '-' && (char) byteUrl[byteIndex - 14] == 'C' && (char) byteUrl[byteIndex - 15] == 'R' && (char) byteUrl[byteIndex - 16] == 'A' && (char) byteUrl[byteIndex - 17] == 'W') {
                             urlFound = true;
-                            stringUrl = "";
+                            byteUrl = new byte[1000];
+                            byteIndex = 0;
                         }
                     }
 
@@ -100,6 +109,10 @@ public class Service {
             }
         }
         return warcUrls;
+    }
+
+    public void compareUrls(){
+
     }
 
 
