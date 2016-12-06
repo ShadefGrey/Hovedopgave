@@ -85,14 +85,15 @@ public class Service {
                                 urlFound = false;
                                 warcUrls += "\n";
                                 numberofurls++;
-                                System.out.println("******************" + numberofurls + "*******************************");
+                                if(numberofurls % 100 == 0) {
+                                    System.out.println("WARC urls found: " + numberofurls);
+                                }
                             }
                         }
                         if (byteIndex >= byteUrl.length) {
                             byteUrl = growByteArray(byteUrl);
                         }
                         byteUrl[byteIndex] = (byte) content;
-//                        System.out.println((char) byteUrl[byteIndex]);
                         byteIndex++;
 
                         if (!urlFound && (char) content == ' ' && byteIndex >= 17 && (char) byteUrl[byteIndex - 2] == ':' && (char) byteUrl[byteIndex - 3] == 'I' && (char) byteUrl[byteIndex - 4] == 'R' &&
@@ -111,9 +112,48 @@ public class Service {
         return warcUrls;
     }
 
-    public void compareUrls(){
+    public void compareUrls(File dirfile) throws IOException {
+//        int matchesFound = 0;
+        String missingUrls = "";
 
+        String[] splitWarcUrls = getWarcUrls(dirfile).split("\n");
+        String[] splitWafUrls = allWafUrls.split("\n");
+
+        System.out.println("WarcUrls: " + splitWafUrls.length+", WafUrls: " + splitWafUrls.length);
+
+        System.out.println("Comparing urls");
+
+        for (String wafUrl : splitWafUrls) {
+            boolean found = false;
+            int i = 0;
+
+            while (!found && i < splitWarcUrls.length) {
+                if (wafUrl.equals(splitWarcUrls[i])) {
+//                    matchesFound++;
+                    found = true;
+                }
+                i++;
+            }
+            if (!found) {
+                missingUrls += wafUrl + "\n";
+            }
+        }
+
+        System.out.println("Comparison complete");
+
+        FileOutputStream fo = new FileOutputStream(dirfile.getPath()+"/missingUrls.txt");
+        if(missingUrls.equals("")){
+            missingUrls = "There were no missing urls";
+        }
+        fo.write(missingUrls.getBytes());
+        fo.close();
     }
+
+//    public void compareUrls(File dirfile, String wafUrls) throws IOException {
+//        String[] splitWarcUrls = getWarcUrls(dirfile).split("\n");
+//        String[] splitWafUrls = wafUrls.split("\n");
+//
+//    }
 
 
     //Only for waf files
@@ -148,6 +188,8 @@ public class Service {
 
             jwattWarcTest(dirToMake, wfn);
 
+            compareUrls(dirToMake);
+
             outputStream.close();
 
 
@@ -156,9 +198,6 @@ public class Service {
         }
     }
 
-    private void urlsToBytes() {
-
-    }
 
     //Runs the JWAT tools warc test on the directory with the newly created WARC files
     private void jwattWarcTest(File dirToMake, String fileName) {
@@ -179,9 +218,9 @@ public class Service {
             }
 
             //TODO url output
-            File urlfile = new File(dirToMake.toString() + "\\urls.txt");
-            FileOutputStream urlout = new FileOutputStream(urlfile);
-            urlout.write(allWafUrls.getBytes());
+//            File urlfile = new File(dirToMake.toString() + "\\urls.txt");
+//            FileOutputStream urlout = new FileOutputStream(urlfile);
+//            urlout.write(allWafUrls.getBytes());
 
 
             outputfile.close();

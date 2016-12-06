@@ -86,15 +86,31 @@ public class TestStuff {
 //            e.printStackTrace();
 //        }
 
-        Service s = new Service();
-        File dir = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testTheOtherThing");
-        try {
-            FileOutputStream fo = new FileOutputStream(dir.getPath()+"/warcUrls");
-            fo.write(s.getWarcUrls(dir).getBytes());
-//            System.out.println(s.getWarcUrls(dir));
-        } catch (Exception e) {
-            e.printStackTrace();
+//        Service s = new Service();
+//        File dir = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testTheOtherThing");
+//        try {
+//            FileOutputStream fo = new FileOutputStream(dir.getPath()+"/warcUrls");
+//            fo.write(s.getWarcUrls(dir).getBytes());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+        String s = "adksf.sdf\nsoidrgse943\nfskdbwioshgrioawhefuihsa.fsd\n\n";
+        String[] split = s.split("\n");
+//        System.out.println(split);
+        System.out.println(split.length);
+        for (String st : split) {
+            System.out.println(st);
         }
+        int i = 753;
+        for (int numberofurls = 0; numberofurls < i; numberofurls++) {
+            if (numberofurls % 100 == 0) {
+                System.out.println("******************" + numberofurls + "*******************************");
+            }
+        }
+
+
 
     }
 
