@@ -60,12 +60,13 @@ public class Service {
     }
 
 
-    public String getWarcUrls(File dirFile) throws IOException {
-        String warcUrls = "";
+    private byte[] getWarcUrls(File dirFile) throws IOException {
+        //TODO could change it so it will skip looking for however long the content length is, since the next target url cant be in content.
+        byte[] warcUrls = new byte[1000];
+        int urlIndex = 0;
         int numberofurls = 0;
         if (dirFile.isDirectory()) {
             File[] files = dirFile.listFiles();
-
 
             for (File f : files) {
                 if (f.getName().substring(f.getName().length() - 4).equals("warc")) {
@@ -80,12 +81,20 @@ public class Service {
                     while ((content = fi.read()) != -1) {
                         if (urlFound) {
                             if ((char) content != '\r') {
-                                warcUrls += (char) content;
+                                if (urlIndex >= warcUrls.length) {
+                                    warcUrls = growByteArray(warcUrls);
+                                }
+                                warcUrls[urlIndex] = (byte) content;
+                                urlIndex++;
                             } else {
                                 urlFound = false;
-                                warcUrls += "\n";
+                                if (urlIndex >= warcUrls.length) {
+                                    warcUrls = growByteArray(warcUrls);
+                                }
+                                warcUrls[urlIndex] = '\n';
+                                urlIndex++;
                                 numberofurls++;
-                                if(numberofurls % 100 == 0) {
+                                if (numberofurls % 100 == 0) {
                                     System.out.println("WARC urls found: " + numberofurls);
                                 }
                             }
@@ -109,17 +118,27 @@ public class Service {
                 }
             }
         }
-        return warcUrls;
+
+        byte[] urlsToReturn = new byte[urlIndex];
+        for (int i = 0; i < urlIndex; i++) {
+            urlsToReturn[i] = warcUrls[i];
+        }
+        return urlsToReturn;
     }
 
-    public void compareUrls(File dirfile) throws IOException {
-//        int matchesFound = 0;
+    private void compareUrls(File dirfile) throws IOException {
         String missingUrls = "";
+        byte[] warcUrlBytes = getWarcUrls(dirfile);
+        String allWarcUrls = "";
 
-        String[] splitWarcUrls = getWarcUrls(dirfile).split("\n");
+        for (byte b : warcUrlBytes) {
+            allWarcUrls += (char) b;
+        }
+
+        String[] splitWarcUrls = allWarcUrls.split("\n");
         String[] splitWafUrls = allWafUrls.split("\n");
 
-        System.out.println("WarcUrls: " + splitWafUrls.length+", WafUrls: " + splitWafUrls.length);
+        System.out.println("WarcUrls: " + splitWafUrls.length + ", WafUrls: " + splitWafUrls.length);
 
         System.out.println("Comparing urls");
 
@@ -141,19 +160,13 @@ public class Service {
 
         System.out.println("Comparison complete");
 
-        FileOutputStream fo = new FileOutputStream(dirfile.getPath()+"/missingUrls.txt");
-        if(missingUrls.equals("")){
+        FileOutputStream fo = new FileOutputStream(dirfile.getPath() + "/missingUrls.txt");
+        if (missingUrls.equals("")) {
             missingUrls = "There were no missing urls";
         }
         fo.write(missingUrls.getBytes());
         fo.close();
     }
-
-//    public void compareUrls(File dirfile, String wafUrls) throws IOException {
-//        String[] splitWarcUrls = getWarcUrls(dirfile).split("\n");
-//        String[] splitWafUrls = wafUrls.split("\n");
-//
-//    }
 
 
     //Only for waf files

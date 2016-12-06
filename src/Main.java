@@ -37,7 +37,7 @@ public class Main {
 
         Service service = new Service();  //Converter et directory med waf filer fra netarkiv-old
         File f = new File("Z:\\fra_Niels_Brugger_2009_06_15\\Leveret fra Niels Bruegger, 090611\\Arkiverede netsteder (primær opbevaring)\\Arkiveret\\Arkiveret -020215 (DVD)");
-        File dirToMake = new File("Z:\\Waf2WarcUrlCheck");
+        File dirToMake = new File("Z:\\Waf2WarcUrlCheck\\Arkiveret -020215 (DVD)");
         String warFileName = "Arkiveret -020215 (DVD)";
         service.writeFile(f, dirToMake, warFileName, true);
 

@@ -49,6 +49,58 @@ public class TestStuff {
 //    }
 
 
+//    public void compareUrls(File warc, File waf) throws IOException {
+//        String missingUrls = "";
+//
+//        FileInputStream fit = new FileInputStream(waf);
+//        int content;
+//        String wafUrls = "";
+//
+//        while ((content = fit.read()) != -1) {
+//            wafUrls += (char) content;
+//        }
+//
+//        fit = new FileInputStream(warc);
+//        int content2;
+//        String warcUrls = "";
+//
+//        while ((content2 = fit.read()) != -1) {
+//            warcUrls += (char) content2;
+//        }
+//
+//
+//        String[] splitWarcUrls = warcUrls.split("\n");
+//        String[] splitWafUrls = wafUrls.split("\n");
+//
+//        System.out.println("WarcUrls: " + splitWafUrls.length + ", WafUrls: " + splitWafUrls.length);
+//
+//        System.out.println("Comparing urls");
+//
+//        for (String wafUrl : splitWafUrls) {
+//            boolean found = false;
+//            int i = 0;
+//
+//            while (!found && i < splitWarcUrls.length) {
+//                if (wafUrl.equals(splitWarcUrls[i])) {
+//                    found = true;
+//                }
+//                i++;
+//            }
+//            if (!found) {
+//                missingUrls += wafUrl + "\n";
+//            }
+//        }
+//        System.out.println("Comparison complete");
+//
+//        FileOutputStream fo = new FileOutputStream(warc.getPath() + ".missingUrls.txt");
+//        if (missingUrls.equals("")) {
+//            missingUrls = "There were no missing urls";
+//        }
+//        fo.write(missingUrls.getBytes());
+//        fo.close();
+//    }
+
+
     public static void main(String[] args) {
 
 //        try {
@@ -96,20 +148,14 @@ public class TestStuff {
 //        }
 
 
-        String s = "adksf.sdf\nsoidrgse943\nfskdbwioshgrioawhefuihsa.fsd\n\n";
-        String[] split = s.split("\n");
-//        System.out.println(split);
-        System.out.println(split.length);
-        for (String st : split) {
-            System.out.println(st);
-        }
-        int i = 753;
-        for (int numberofurls = 0; numberofurls < i; numberofurls++) {
-            if (numberofurls % 100 == 0) {
-                System.out.println("******************" + numberofurls + "*******************************");
-            }
-        }
-
+//        File warc = new File("C:\\Users\\ckha\\Desktop\\WAFtoWarcTest\\testTheOtherThing\\warc.txt");
+//        File waf = new File("C:\\Users\\ckha\\Desktop\\WAFtoWarcTest\\testTheOtherThing\\waf.txt");
+//        TestStuff t = new TestStuff();
+//        try {
+//            t.compareUrls(warc, waf);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
     }
