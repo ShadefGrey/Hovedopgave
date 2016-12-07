@@ -62,6 +62,7 @@ public class Service {
 
     private byte[] getWarcUrls(File dirFile) throws IOException {
         //TODO could change it so it will skip looking for however long the content length is, since the next target url cant be in content.
+        //TODO should check on date besides from just url to ensure that multiple of the same urls from different dates get checkd properly
         byte[] warcUrls = new byte[1000];
         int urlIndex = 0;
         int numberofurls = 0;
@@ -200,6 +201,10 @@ public class Service {
             }
 
             jwattWarcTest(dirToMake, wfn);
+
+            outputStream = new FileOutputStream(dirToMake.getPath() + "\\wafUrls.txt");
+
+            outputStream.write(allWafUrls.getBytes());
 
             compareUrls(dirToMake);
 
