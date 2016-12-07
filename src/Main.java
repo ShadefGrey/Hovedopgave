@@ -29,17 +29,17 @@ public class Main {
 //        File writeToFile = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/test9.warc");
 //        service.writeFile(writeToFile, f);
 
-        Service service = new Service();  //Converter et directory med waf filer fra netarkiv-old
-        File f = new File("C:\\Users\\ckha\\Desktop\\En waf fil");
-        File dirToMake = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testTheOtherThing");
-        String warFileName = "test";
-        service.writeFile(f, dirToMake, warFileName, true);
-
 //        Service service = new Service();  //Converter et directory med waf filer fra netarkiv-old
-//        File f = new File("Z:\\fra_Niels_Brugger_2009_06_15\\Leveret fra Niels Bruegger, 090611\\Arkiverede netsteder (primær opbevaring)\\Arkiveret\\Arkiveret -020215 (DVD)");
-//        File dirToMake = new File("Z:\\Waf2WarcUrlCheck\\Arkiveret -020215 (DVD)");
-//        String warFileName = "Arkiveret -020215 (DVD)";
+//        File f = new File("C:\\Users\\ckha\\Desktop\\En waf fil");
+//        File dirToMake = new File("C:/Users/ckha/Desktop/WAFtoWarcTest/testTheOtherThing");
+//        String warFileName = "test";
 //        service.writeFile(f, dirToMake, warFileName, true);
+
+        Service service = new Service();  //Converter et directory med waf filer fra netarkiv-old
+        File f = new File("Z:\\fra_Niels_Brugger_2009_06_15\\Leveret fra Niels Bruegger, 090611\\Arkiverede netsteder (primær opbevaring)\\Arkiveret\\Arkiveret -020215 (DVD)");
+        File dirToMake = new File("Z:\\Waf2WarcUrlCheck\\Arkiveret -020215 (DVD)");
+        String warFileName = "Arkiveret -020215 (DVD)";
+        service.writeFile(f, dirToMake, warFileName, true);
 
 
 

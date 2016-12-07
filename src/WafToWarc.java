@@ -83,12 +83,13 @@ public class WafToWarc {
                             if (inputBytes[i - 1] == 't' && inputBytes[i - 2] == 's' && inputBytes[i - 3] == 'o' && inputBytes[i - 4] == 'p') {
                                 cutPost = true;
                                 stop = true;
-                                contentLength = contentLength - 4;
-                                metaEndToAdd = metaEndToAdd + 4;
+                                contentLength = contentLength - 3;
+                                metaEndToAdd = metaEndToAdd + 3;
                             }
                         }
 
                         //contentlength can be -1 when the content is empty, this fixes it.
+                        //this might not be a problem anymore, there was a mistake in earlier code, keeping it to be safe though.
                         if (contentLength < 0) {
                             contentLength = 0;
                         }

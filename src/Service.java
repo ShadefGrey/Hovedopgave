@@ -202,8 +202,8 @@ public class Service {
 
             jwattWarcTest(dirToMake, wfn);
 
+            //Skriver alle de fundne WAF URL'er ud i en fil så hvis den ikke når færdig med at finde alle WARC URL'er skal man ikke starte forfra
             outputStream = new FileOutputStream(dirToMake.getPath() + "\\wafUrls.txt");
-
             outputStream.write(allWafUrls.getBytes());
 
             compareUrls(dirToMake);
