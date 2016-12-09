@@ -101,7 +101,7 @@ public class TestStuff {
 //    }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
 //        try {
 //            String s1 = "http://www.ask-alex.dk/read￥er/a\\a_print.html?ID=￥359&cat=B";
@@ -156,6 +156,13 @@ public class TestStuff {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+
+
+        File dir = new File("C:\\Users\\ckha\\Desktop\\WAFtoWarcTest\\testTheOtherThing");
+        File wafUrls = new File("C:\\Users\\ckha\\Desktop\\WAFtoWarcTest\\testTheOtherThing\\wafUrls.txt");
+        Service serv = new Service();
+
+        serv.compareUrls(dir, wafUrls);
 
 
     }

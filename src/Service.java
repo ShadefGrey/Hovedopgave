@@ -149,7 +149,6 @@ public class Service {
 
             while (!found && i < splitWarcUrls.length) {
                 if (wafUrl.equals(splitWarcUrls[i])) {
-//                    matchesFound++;
                     found = true;
                 }
                 i++;
@@ -158,7 +157,55 @@ public class Service {
                 missingUrls += wafUrl + "\n";
             }
         }
+        System.out.println("Comparison complete");
 
+        FileOutputStream fo = new FileOutputStream(dirfile.getPath() + "/missingUrls.txt");
+        if (missingUrls.equals("")) {
+            missingUrls = "There were no missing urls";
+        }
+        fo.write(missingUrls.getBytes());
+        fo.close();
+    }
+
+    public void compareUrls(File dirfile, File wafUrlFile) throws IOException {
+        String missingUrls = "";
+        byte[] warcUrlBytes = getWarcUrls(dirfile);
+        String allWarcUrls = "";
+
+        for (byte b : warcUrlBytes) {
+            allWarcUrls += (char) b;
+        }
+
+        FileInputStream fInSt = new FileInputStream(wafUrlFile);
+        int content;
+        String wafUrls = "";
+        while ((content = fInSt.read()) != -1) {
+            wafUrls += (char) content;
+        }
+
+
+
+        String[] splitWarcUrls = allWarcUrls.split("\n");
+        String[] splitWafUrls = wafUrls.split("\n");
+
+        System.out.println("WarcUrls: " + splitWafUrls.length + ", WafUrls: " + splitWafUrls.length);
+
+        System.out.println("Comparing urls");
+
+        for (String wafUrl : splitWafUrls) {
+            boolean found = false;
+            int i = 0;
+
+            while (!found && i < splitWarcUrls.length) {
+                if (wafUrl.equals(splitWarcUrls[i])) {
+                    found = true;
+                }
+                i++;
+            }
+            if (!found) {
+                missingUrls += wafUrl + "\n";
+            }
+        }
         System.out.println("Comparison complete");
 
         FileOutputStream fo = new FileOutputStream(dirfile.getPath() + "/missingUrls.txt");
