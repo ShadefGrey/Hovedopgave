@@ -20,7 +20,6 @@ public class Service {
     private int warcFileNumber = 1;
     private UUID warcInfoId;
     private String warcInfoDate;
-    //    private ArrayList<String> allWafUrls = new ArrayList<>();
     private String allWafUrls = "";
 
     private boolean encodeUrl = false;
@@ -127,6 +126,7 @@ public class Service {
         return urlsToReturn;
     }
 
+    //TODO should check on date too, to make it function when there are several of the same url cached at different times.
     private void compareUrls(File dirfile) throws IOException {
         String missingUrls = "";
         byte[] warcUrlBytes = getWarcUrls(dirfile);
@@ -281,12 +281,6 @@ public class Service {
             while ((content = ifile.read()) != -1) {
                 outputfile.write((byte) content);
             }
-
-            //TODO url output
-//            File urlfile = new File(dirToMake.toString() + "\\urls.txt");
-//            FileOutputStream urlout = new FileOutputStream(urlfile);
-//            urlout.write(allWafUrls.getBytes());
-
 
             outputfile.close();
             ifile.close();
